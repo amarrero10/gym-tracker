@@ -56,9 +56,7 @@ tmp/
 temp/
 *.tmp
 
-# Optional local database/files
-*.sqlite
-*.sqlite3
+src/config/seed.js
 
 # Test env files
 .env.test

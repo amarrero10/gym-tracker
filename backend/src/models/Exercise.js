@@ -38,6 +38,9 @@ const exerciseSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Index name for faster search
+exerciseSchema.index({ name: "text" });
+
 // 2. Create model based off schema
 
 const Exercise = mongoose.model("Exercise", exerciseSchema);
