@@ -44,7 +44,7 @@ export const getExercise = async (req, res) => {
 
     res.status(200).json(exercise);
   } catch (error) {
-    console.error("Error fetching user: ", error);
+    console.error("Error fetching exercise: ", error);
     throw error;
   }
 };

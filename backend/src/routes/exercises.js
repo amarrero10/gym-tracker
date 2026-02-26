@@ -10,7 +10,6 @@ import {
 const router = express.Router();
 
 router.get("/", getAllExercises);
-
 router.get("/:id", getExercise);
 router.post("/", createExercise);
 router.put("/:id", updateExercise);
