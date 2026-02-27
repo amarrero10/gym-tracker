@@ -1,5 +1,4 @@
 import Plan from "../models/Plan.js";
-import Exercise from "../models/Exercise.js";
 
 export const getAllPlans = async (req, res) => {
   try {
@@ -41,12 +40,58 @@ export const getPlan = async (req, res) => {
 
     if (!plan) {
       console.log("No plan with that id");
-      return null;
+      res.status(404).json({ message: "No plan with that id." });
     }
 
     res.status(200).json(plan);
   } catch (error) {
     console.error("Error fetching plan: ", error);
-    throw error;
+    res.status(500).json({ message: "Error finding plan" });
+  }
+};
+
+export const editplan = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updateData = req.body;
+
+    const plan = await Plan.findByIdAndUpdate(id, updateData, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+
+    if (!plan) {
+      return res.status(404).json({ message: "Plan not found" });
+    }
+
+    res.status(200).json(plan);
+  } catch (error) {
+    res.status(400).json({ message: error });
+    console.error(error);
+  }
+};
+
+// LOGIC TO UPDATE NESTED SUB DOCUMENT:
+
+// {
+//   "$set": {
+//     "weeks.0.days.0.title": "5 day work out plan"
+//   }
+// }
+
+export const deletePlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const plan = await Plan.findByIdAndDelete(id);
+
+    if (!plan) {
+      res.status(404).json({ message: "Error finding plan with that id" });
+    }
+
+    res.status(201).json({ message: "Plan has been deleted." });
+  } catch (error) {
+    console.error("Problem getting results, ", error);
   }
 };
