@@ -5,6 +5,7 @@ import {
   editplan,
   getAllPlans,
   getPlan,
+  getProgress,
 } from "../controllers/planController.js";
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.post("/", createPlan);
 router.get("/:id", getPlan);
 router.patch("/:id", editplan);
 router.delete("/:id", deletePlan);
+router.get("/:planId/progress", getProgress);
 
 export default router;
