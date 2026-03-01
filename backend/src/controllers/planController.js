@@ -97,8 +97,6 @@ export const deletePlan = async (req, res) => {
 
     const plan = await Plan.findByIdAndDelete(id);
 
-    console.log(plan);
-
     if (plan.deletedCount === 1) {
       res
         .status(200)
