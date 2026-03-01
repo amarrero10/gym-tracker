@@ -30,7 +30,7 @@ export const createPlan = async (req, res) => {
 
     res.status(201).json({ newPlan });
   } catch (error) {
-    console.error("Problem getting results blah: ", error);
+    console.error("Problem getting results: ", error);
     res.status(500).json({ message: "Error creating plan" });
   }
 };
