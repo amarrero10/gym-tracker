@@ -3,9 +3,11 @@ import Session from "../models/Session.js";
 import mongoose from "mongoose";
 
 export const getAllPlans = async (req, res) => {
+  const { userId } = req.user;
+
   try {
-    const exercises = await Plan.find().sort({ name: "asc" });
-    res.status(200).json(exercises);
+    const plans = await Plan.find({ userId }).sort({ name: "asc" });
+    res.status(200).json(plans);
   } catch (error) {
     console.error("Error getting plans: ", error);
   }
@@ -14,17 +16,19 @@ export const getAllPlans = async (req, res) => {
 export const createPlan = async (req, res) => {
   try {
     const { name, weeksCount, daysPerWeek, weeks } = req.body;
+    const { userId } = req.user;
 
     const newPlan = new Plan({
       name,
       weeksCount,
       daysPerWeek,
       weeks,
+      userId,
     });
 
     await newPlan.save();
 
-    res.status(201).json({ message: "Plan created!" });
+    res.status(201).json({ newPlan });
   } catch (error) {
     console.error("Problem getting results: ", error);
     res.status(500).json({ message: "Error creating plan" });
@@ -34,8 +38,9 @@ export const createPlan = async (req, res) => {
 export const getPlan = async (req, res) => {
   try {
     const planId = req.params.id;
+    const { userId } = req.user;
 
-    const plan = await Plan.findById(planId).populate({
+    const plan = await Plan.findOne({ _id: planId, userId }).populate({
       path: "weeks.days.exercises.exerciseId",
       model: "Exercise",
     });
@@ -55,10 +60,11 @@ export const getPlan = async (req, res) => {
 export const editplan = async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId } = req.user;
 
     const updateData = req.body;
 
-    const plan = await Plan.findByIdAndUpdate(id, updateData, {
+    const plan = await Plan.updateOne({ _id: id, userId }, updateData, {
       returnDocument: "after",
       runValidators: true,
     });
@@ -67,7 +73,7 @@ export const editplan = async (req, res) => {
       return res.status(404).json({ message: "Plan not found" });
     }
 
-    res.status(200).json(plan);
+    res.status(200).json({ updatedPlan: plan });
   } catch (error) {
     res.status(400).json({ message: error });
     console.error(error);
@@ -85,14 +91,21 @@ export const editplan = async (req, res) => {
 export const deletePlan = async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId } = req.user;
+
+    console.log(id, userId);
 
     const plan = await Plan.findByIdAndDelete(id);
 
-    if (!plan) {
-      res.status(404).json({ message: "Error finding plan with that id" });
-    }
+    console.log(plan);
 
-    res.status(201).json({ message: "Plan has been deleted." });
+    if (plan.deletedCount === 1) {
+      res
+        .status(200)
+        .json({ message: `Plan has been deleted: ${plan.deletedCount} ` });
+    } else {
+      res.status(400).json({ message: "Error deleting Plan" });
+    }
   } catch (error) {
     console.error("Problem getting results, ", error);
   }
@@ -101,6 +114,7 @@ export const deletePlan = async (req, res) => {
 export const getProgress = async (req, res) => {
   try {
     const { planId } = req.params;
+    const { userId } = req.user;
 
     console.log(planId);
 
@@ -114,7 +128,7 @@ export const getProgress = async (req, res) => {
 
     const progress = {};
 
-    const plan = await Plan.findById(planId);
+    const plan = await Plan.findOne({ _id: planId, userId });
 
     if (!plan) {
       return res.status(404).json({ message: "plan not found" });
@@ -122,11 +136,12 @@ export const getProgress = async (req, res) => {
 
     const completedCount = await Session.countDocuments({
       planId,
+      userId,
       status: "completed",
     });
 
     const result = await Session.find(
-      { planId, status: "completed" },
+      { planId, status: "completed", userId },
       {
         weekNumber: 1,
         dayNumber: 1,

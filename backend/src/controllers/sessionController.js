@@ -1,16 +1,23 @@
 import mongoose from "mongoose";
 import Session from "../models/Session.js";
 import Plan from "../models/Plan.js";
-import Exercise from "../models/Exercise.js";
 
 export const createSession = async (req, res) => {
   try {
     const { planId, weekNumber, dayNumber } = req.body;
+    const { userId } = req.user;
+
+    if (!userId) {
+      res
+        .status(403)
+        .json({ message: "Must be logged in to create a session." });
+      return;
+    }
 
     // 1) Basic validation
     if (!planId || weekNumber == null || dayNumber == null) {
       return res.status(400).json({
-        message: "planId, weekNumber, and dayNumber are required",
+        message: "planId, weekNumber, user, and dayNumber are required",
       });
     }
 
@@ -24,7 +31,7 @@ export const createSession = async (req, res) => {
     }
 
     // 2) Load plan
-    const plan = await Plan.findById(planId);
+    const plan = await Plan.findOne({ _id: planId, userId });
     if (!plan) {
       return res.status(404).json({ message: "Plan not found" });
     }
@@ -51,6 +58,7 @@ export const createSession = async (req, res) => {
     // 5) Prevent duplicate in-progress sessions for same plan/week/day
     const existing = await Session.findOne({
       planId,
+      userId,
       weekNumber: weekNum,
       dayNumber: dayNum,
       status: "in_progress",
@@ -88,6 +96,7 @@ export const createSession = async (req, res) => {
       status: "in_progress",
       startedAt: new Date(),
       exercises: sessionExercises,
+      userId,
     });
 
     // 8) Return created session
@@ -103,8 +112,16 @@ export const addSet = async (req, res) => {
   try {
     const { reps, weight, notes, isCompleted } = req.body;
     const { sessionId, sessionExerciseId } = req.params;
+    const { userId } = req.user;
 
-    const session = await Session.findById(sessionId);
+    if (!userId) {
+      res
+        .status(403)
+        .json({ message: "Must be logged in to create a session." });
+      return;
+    }
+
+    const session = await Session.findOne({ _id: sessionId, userId });
 
     const exercise = session.exercises.id(sessionExerciseId);
     const setNumber = exercise.sets.length + 1;
@@ -133,8 +150,16 @@ export const editSet = async (req, res) => {
   try {
     const { reps, weight, notes, isCompleted } = req.body;
     const { sessionId, sessionExerciseId, setId } = req.params;
+    const { userId } = req.user;
 
-    const session = await Session.findById(sessionId);
+    if (!userId) {
+      res
+        .status(403)
+        .json({ message: "Must be logged in to create a session." });
+      return;
+    }
+
+    const session = await Session.findOne({ _id: sessionId, userId });
 
     if (!session) {
       return res.status(404).json({ message: `${sessionId} not found` });
@@ -183,9 +208,17 @@ export const editSet = async (req, res) => {
 
 export const finishSession = async (req, res) => {
   try {
+    const { userId } = req.user;
     const { sessionId } = req.params;
 
-    const session = await Session.findById(sessionId);
+    if (!userId) {
+      res
+        .status(403)
+        .json({ message: "Must be logged in to create a session." });
+      return;
+    }
+
+    const session = await Session.findOne({ _id: sessionId, userId });
 
     if (!session) {
       return res.status(404).json({ message: ` ${sessionId} not found.` });
@@ -212,6 +245,14 @@ export const finishSession = async (req, res) => {
 export const getInProgressSession = async (req, res) => {
   try {
     const { planId } = req.query;
+    const { userId } = req.user;
+
+    if (!userId) {
+      res
+        .status(403)
+        .json({ message: "Must be logged in to create a session." });
+      return;
+    }
 
     // 1) Validate input
     if (!planId) {
@@ -225,8 +266,9 @@ export const getInProgressSession = async (req, res) => {
     // 2) Find newest in-progress session for this plan
     const session = await Session.findOne({
       planId,
+      userId,
       status: "in_progress",
-    }).sort({ startedAt: "asc", createdAt: "asc" });
+    }).sort({ startedAt: "desc", createdAt: "desc" });
 
     // 3) Return session or null (simplest for frontend)
     return res.status(200).json({ session: session ?? null });

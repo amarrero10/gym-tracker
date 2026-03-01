@@ -94,6 +94,11 @@ const workoutSessionSchema = new mongoose.Schema(
     completedAt: {
       type: Date,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     exercises: [sessionExerciseSchema],
   },
   { timestamps: true },
