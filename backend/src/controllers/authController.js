@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import { signToken } from "../utils/jwt.js";
+import requireAuth from "../middleware/requireAuth.js";
 
 const router = express.Router();
 
@@ -91,6 +92,10 @@ export const login = async (req, res) => {
     return res.status(500).json({ message: "Error logging in" });
   }
 };
+
+router.get("/me", requireAuth, async (req, res) => {
+  res.json({ user: req.user });
+});
 
 export default router;
 
