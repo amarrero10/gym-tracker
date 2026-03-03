@@ -1,9 +1,12 @@
-import "./App.css";
+import { Route, Routes } from "react-router";
+import Login from "./pages/Login";
 
 function App() {
   return (
     <>
-      <h1>Hello</h1>
+      <Routes>
+        <Route path="sign-in" element={<Login />} />
+      </Routes>
     </>
   );
 }
