@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import RequireAuth from "./auth/RequireAuth";
 import Register from "./pages/Register";
+import ProtectedLayout from "./components/ProtectedLayout";
 
 function App() {
   return (
@@ -11,7 +12,9 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route element={<RequireAuth />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<Dashboard />} />
+          </Route>
         </Route>
       </Routes>
     </>
@@ -19,3 +22,7 @@ function App() {
 }
 
 export default App;
+
+{
+  /* <Route element={<ProtectedLayout />}></Route>; */
+}

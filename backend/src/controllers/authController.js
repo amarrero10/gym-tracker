@@ -93,9 +93,21 @@ export const login = async (req, res) => {
   }
 };
 
-router.get("/me", requireAuth, async (req, res) => {
-  res.json({ user: req.user });
-});
+export const getMe = async (req, res) => {
+  const user = await User.findById(req.user.userId).select(
+    "_id username displayName",
+  ); // only safe fields
+
+  if (!user) return res.status(401).json({ message: "User not found" });
+
+  return res.json({
+    user: {
+      id: user._id,
+      username: user.username,
+      displayName: user.displayName,
+    },
+  });
+};
 
 export default router;
 

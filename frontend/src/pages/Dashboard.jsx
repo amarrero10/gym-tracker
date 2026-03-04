@@ -1,16 +1,8 @@
-import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
+import Plans from "../components/Plans";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-  console.log(user);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login", { replace: true });
-  };
+  const { user } = useAuth();
 
   return (
     <div>
@@ -18,7 +10,7 @@ const Dashboard = () => {
       <p>
         Welcome, {user?.displayName} with user id of: {user.id}
       </p>
-      <button onClick={handleLogout}>Logout</button>
+      <Plans />
     </div>
   );
 };
