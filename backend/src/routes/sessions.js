@@ -4,12 +4,14 @@ import {
   createSession,
   editSet,
   finishSession,
+  getCompletedSessions,
   getInProgressSession,
 } from "../controllers/sessionController.js";
 
 const router = express.Router();
 
 router.get("/in-progress", getInProgressSession);
+router.get("/completed-sessions", getCompletedSessions);
 router.post("/start", createSession);
 router.post("/:sessionId/finish", finishSession);
 router.post("/:sessionId/exercises/:sessionExerciseId/sets", addSet);

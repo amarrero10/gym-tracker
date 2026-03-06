@@ -54,6 +54,7 @@ export const createSession = async (req, res) => {
 
     const weekId = week._id;
     const dayId = day._id;
+    const dayTitle = day.title;
 
     // 5) Prevent duplicate in-progress sessions for same plan/week/day
     const existing = await Session.findOne({
@@ -96,6 +97,7 @@ export const createSession = async (req, res) => {
       status: "in_progress",
       startedAt: new Date(),
       exercises: sessionExercises,
+      title: dayTitle,
       userId,
     });
 
@@ -272,6 +274,44 @@ export const getInProgressSession = async (req, res) => {
 
     // 3) Return session or null (simplest for frontend)
     return res.status(200).json({ session: session ?? null });
+  } catch (error) {
+    console.error("Error fetching in-progress session:", error);
+    return res
+      .status(500)
+      .json({ message: "Error fetching in-progress session" });
+  }
+};
+
+export const getCompletedSessions = async (req, res) => {
+  try {
+    const { planId } = req.query;
+    const { userId } = req.user;
+
+    if (!userId) {
+      res
+        .status(403)
+        .json({ message: "Must be logged in to create a session." });
+      return;
+    }
+
+    // 1) Validate input
+    if (!planId) {
+      return res.status(400).json({ message: "planId is required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(planId)) {
+      return res.status(400).json({ message: "Invalid planId" });
+    }
+
+    // 2) Find all completed sessions sorted by newest completedAt date
+    const sessions = await Session.find({
+      planId,
+      userId,
+      status: "completed",
+    }).sort({ completedAt: "desc" });
+
+    // 3) Return session or null (simplest for frontend)
+    return res.status(200).json({ sessions: sessions ?? null });
   } catch (error) {
     console.error("Error fetching in-progress session:", error);
     return res
