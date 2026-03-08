@@ -282,6 +282,41 @@ export const getInProgressSession = async (req, res) => {
   }
 };
 
+export const getSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.user;
+
+    if (!userId) {
+      res
+        .status(403)
+        .json({ message: "Must be logged in to create a session." });
+      return;
+    }
+
+    // 1) Validate input
+    if (!id) {
+      return res.status(400).json({ message: "session id is required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid session id" });
+    }
+
+    // 2) Find newest in-progress session for this plan
+    const session = await Session.findOne({
+      _id: id,
+      userId,
+    }).sort({ startedAt: "desc", createdAt: "desc" });
+
+    // 3) Return session or null (simplest for frontend)
+    return res.status(200).json(session);
+  } catch (error) {
+    console.error("Error fetching session:", error);
+    return res.status(500).json({ message: "Error fetching session" });
+  }
+};
+
 export const getCompletedSessions = async (req, res) => {
   try {
     const { planId } = req.query;

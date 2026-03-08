@@ -1,7 +1,8 @@
-import React from "react";
+import { useParams } from "react-router";
 
 const PlanDetail = () => {
-  return <div>PlanDetail</div>;
+  const { id } = useParams();
+  return <div className=" text-white">PlanDetail {id}</div>;
 };
 
 export default PlanDetail;

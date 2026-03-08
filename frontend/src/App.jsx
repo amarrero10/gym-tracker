@@ -4,6 +4,9 @@ import Dashboard from "./pages/Dashboard";
 import RequireAuth from "./auth/RequireAuth";
 import Register from "./pages/Register";
 import ProtectedLayout from "./components/ProtectedLayout";
+import PlanDetail from "./pages/PlanDetail";
+import Session from "./pages/Session";
+import Set from "./pages/Set";
 
 function App() {
   return (
@@ -14,6 +17,12 @@ function App() {
         <Route element={<RequireAuth />}>
           <Route element={<ProtectedLayout />}>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/plans/:id" element={<PlanDetail />} />
+            <Route path="/session/:id" element={<Session />} />
+            <Route
+              path="/session/set/:sessionId/exercise/:exerciseId"
+              element={<Set />}
+            />
           </Route>
         </Route>
       </Routes>

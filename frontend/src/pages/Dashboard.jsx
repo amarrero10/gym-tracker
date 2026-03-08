@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
+import { useNavigate } from "react-router";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [greeting, setGreeting] = useState(null);
   const [plans, setPlans] = useState([]);
-  const [error, setError] = useState(null);
-  const [selectedPlanId, setSelectedPlanId] = useState(null);
-  const [activeWeek, setActiveWeek] = useState(1);
-  const [openDayKey, setOpenDayKey] = useState(null);
-  const [inProgressSession, setInProgressSession] = useState(null);
   const [activePlan, setActivePlan] = useState(null);
   const [activeSession, setActiveSession] = useState(null);
   const [completedSessions, setCompletedSessions] = useState([]);
@@ -35,7 +33,7 @@ const Dashboard = () => {
     };
 
     getPlans();
-  }, [user, token]);
+  }, [token]);
 
   useEffect(() => {
     const date = new Date();
@@ -69,10 +67,25 @@ const Dashboard = () => {
     fetchSessions();
   }, [plans]);
 
-  if (error) return <div className=" text-white">Error: {error.message}</div>;
+  const goToPlanDetails = () => {
+    navigate(`/plans/${activePlan?._id}`);
+  };
+
+  const goToSession = () => {
+    navigate(`/session/${activeSession?._id}`);
+  };
+
+  if (error)
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center">
+        <div className=" text-white">Error: {error.message}</div>
+      </div>
+    );
   if (loading)
     return (
-      <div class="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin"></div>
+      <div className="min-h-screen w-full flex items-center justify-center">
+        <div className="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin" />
+      </div>
     );
 
   return (
@@ -89,8 +102,12 @@ const Dashboard = () => {
       <hr className="w-87.5 h-px border-0 my-6 bg-[#2A2A33]" />
 
       <div className="bg-[#14141A] rounded-2xl p-4 mb-6">
-        <p className="text-white py-2"> Current Plan: {activePlan?.name}</p>
-        <button className="bg-[#7A1218] text-[#FFFFFF]  w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4">
+        <p className="text-[#9AA0AA] ">Current Plan</p>
+        <p className="text-white py-2"> {activePlan?.name}</p>
+        <button
+          onClick={goToPlanDetails}
+          className="bg-[#7A1218] text-[#FFFFFF]  w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4"
+        >
           Plan Overview
         </button>
       </div>
@@ -102,8 +119,11 @@ const Dashboard = () => {
         <p className="text-[#9AA0AA]">
           {activeSession?.exercises.length} exercises
         </p>
-        <button className="bg-[#7A1218] text-[#FFFFFF]  w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4">
-          Start
+        <button
+          onClick={goToSession}
+          className="bg-[#7A1218] text-[#FFFFFF]  w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4"
+        >
+          Go to workout
         </button>
       </div>
 
