@@ -32,6 +32,11 @@ const CreatePlan = () => {
   const [addingTo, setAddingTo] = useState(null);
   const [exerciseForm, setExerciseForm] = useState(defaultExerciseForm);
 
+  // Inline create-exercise sub-form
+  const [creatingExercise, setCreatingExercise] = useState(false);
+  const [newExForm, setNewExForm] = useState({ name: "", muscleGroup: "", movementPattern: "", equipment: "" });
+  const [newExError, setNewExError] = useState(null);
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -79,6 +84,33 @@ const CreatePlan = () => {
     setAddingTo(null);
     setExerciseForm(defaultExerciseForm);
     setExerciseSearch("");
+    setCreatingExercise(false);
+    setNewExForm({ name: "", muscleGroup: "", movementPattern: "", equipment: "" });
+    setNewExError(null);
+  };
+
+  const submitNewExercise = async () => {
+    const name = newExForm.name.trim().toLowerCase();
+    const duplicate = exercises.find((e) => e.name.toLowerCase() === name);
+    if (duplicate) {
+      setNewExError("An exercise with this name already exists.");
+      return;
+    }
+    try {
+      await api.post("/exercises", newExForm, { headers });
+      const res = await api.get("/exercises", { headers });
+      setExercises(res.data);
+      const created = res.data.find((e) => e.name === name);
+      if (created) {
+        setExerciseForm((prev) => ({ ...prev, exerciseId: created._id }));
+        setExerciseSearch(created.name);
+      }
+      setCreatingExercise(false);
+      setNewExForm({ name: "", muscleGroup: "", movementPattern: "", equipment: "" });
+      setNewExError(null);
+    } catch (err) {
+      setNewExError(err.response?.data?.message ?? "Error creating exercise");
+    }
   };
 
   const confirmAddExercise = (wi, di) => {
@@ -263,27 +295,84 @@ const CreatePlan = () => {
 
               {addingTo?.wi === wi && addingTo?.di === di ? (
                 <div className="bg-zinc-900 rounded-xl p-3 flex flex-col gap-2">
-                  <input
-                    value={exerciseSearch}
-                    onChange={(e) => setExerciseSearch(e.target.value)}
-                    placeholder="Search exercise..."
-                    className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
-                  />
-                  {exerciseSearch && (
-                    <div className="max-h-36 overflow-y-auto flex flex-col gap-1">
-                      {filteredExercises.map((e) => (
+                  {!creatingExercise ? (
+                    <>
+                      <input
+                        value={exerciseSearch}
+                        onChange={(e) => setExerciseSearch(e.target.value)}
+                        placeholder="Search exercise..."
+                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                      />
+                      {exerciseSearch && (
+                        <div className="max-h-36 overflow-y-auto flex flex-col gap-1">
+                          {filteredExercises.map((e) => (
+                            <button
+                              key={e._id}
+                              onClick={() => {
+                                setExerciseForm((prev) => ({ ...prev, exerciseId: e._id }));
+                                setExerciseSearch(e.name);
+                              }}
+                              className={`text-left px-3 py-2 rounded-lg text-sm ${exerciseForm.exerciseId === e._id ? "bg-[#7A1218] text-white" : "text-zinc-300 bg-zinc-800"}`}
+                            >
+                              {e.name}
+                            </button>
+                          ))}
+                          {filteredExercises.length === 0 && (
+                            <p className="text-zinc-500 text-xs px-2 py-1">No matches found.</p>
+                          )}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => { setCreatingExercise(true); setNewExError(null); }}
+                        className="text-xs text-[#7A1218] border border-[#7A1218] rounded-xl px-3 py-2 text-left"
+                      >
+                        + Create new exercise
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-white text-sm font-medium">New Exercise</p>
+                      {newExError && <p className="text-red-400 text-xs">{newExError}</p>}
+                      <input
+                        value={newExForm.name}
+                        onChange={(e) => setNewExForm((p) => ({ ...p, name: e.target.value }))}
+                        placeholder="Exercise name"
+                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                      />
+                      <input
+                        value={newExForm.muscleGroup}
+                        onChange={(e) => setNewExForm((p) => ({ ...p, muscleGroup: e.target.value }))}
+                        placeholder="Muscle group (e.g. chest)"
+                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                      />
+                      <input
+                        value={newExForm.movementPattern}
+                        onChange={(e) => setNewExForm((p) => ({ ...p, movementPattern: e.target.value }))}
+                        placeholder="Movement pattern (e.g. push)"
+                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                      />
+                      <input
+                        value={newExForm.equipment}
+                        onChange={(e) => setNewExForm((p) => ({ ...p, equipment: e.target.value }))}
+                        placeholder="Equipment (e.g. barbell)"
+                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                      />
+                      <div className="flex gap-2 mt-1">
                         <button
-                          key={e._id}
-                          onClick={() => {
-                            setExerciseForm((prev) => ({ ...prev, exerciseId: e._id }));
-                            setExerciseSearch(e.name);
-                          }}
-                          className={`text-left px-3 py-2 rounded-lg text-sm ${exerciseForm.exerciseId === e._id ? "bg-[#7A1218] text-white" : "text-zinc-300 bg-zinc-800"}`}
+                          onClick={() => { setCreatingExercise(false); setNewExError(null); }}
+                          className="flex-1 py-2 rounded-xl text-white text-sm border border-zinc-700"
                         >
-                          {e.name}
+                          Back
                         </button>
-                      ))}
-                    </div>
+                        <button
+                          onClick={submitNewExercise}
+                          disabled={!newExForm.name.trim() || !newExForm.muscleGroup.trim() || !newExForm.movementPattern.trim() || !newExForm.equipment.trim()}
+                          className="flex-1 py-2 rounded-xl text-white text-sm bg-[#7A1218] disabled:opacity-40"
+                        >
+                          Create &amp; Select
+                        </button>
+                      </div>
+                    </>
                   )}
 
                   <div className="flex gap-2">
