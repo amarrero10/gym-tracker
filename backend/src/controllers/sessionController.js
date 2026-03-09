@@ -270,7 +270,7 @@ export const getInProgressSession = async (req, res) => {
       planId,
       userId,
       status: "in_progress",
-    }).sort({ startedAt: "desc", createdAt: "desc" });
+    }).sort({ startedAt: "asc", createdAt: "asc" });
 
     // 3) Return session or null (simplest for frontend)
     return res.status(200).json({ session: session ?? null });

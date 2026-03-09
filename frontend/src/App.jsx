@@ -8,6 +8,8 @@ import PlanDetail from "./pages/PlanDetail";
 import Session from "./pages/Session";
 import Set from "./pages/Set";
 import EditSet from "./pages/EditSet";
+import Plans from "./pages/Plans";
+import CreatePlan from "./pages/CreatePlan";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route element={<RequireAuth />}>
           <Route element={<ProtectedLayout />}>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/plans" element={<Plans />} />
+            <Route path="/plans/create" element={<CreatePlan />} />
             <Route path="/plans/:id" element={<PlanDetail />} />
             <Route path="/session/:id" element={<Session />} />
             <Route path="/session/:sessionId/set/:setId/exercise/:exerciseId" element={<Set />} />

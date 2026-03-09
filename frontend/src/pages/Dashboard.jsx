@@ -118,20 +118,35 @@ const Dashboard = () => {
 
       <hr className="w-87.5 h-px border-0 my-6 bg-[#2A2A33]" />
 
-      <div className="bg-[#14141A] rounded-2xl p-4 mb-6">
-        <p className="text-[#9AA0AA] ">Current Plan</p>
-        <p className="text-white py-2"> {activePlan?.name}</p>
-        <button
-          onClick={goToPlanDetails}
-          className="bg-[#7A1218] text-[#FFFFFF]  w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4"
-        >
-          Plan Overview
-        </button>
-      </div>
+      {activePlan && (
+        <div className="bg-[#14141A] rounded-2xl p-4 mb-6">
+          <p className="text-[#9AA0AA]">Current Plan</p>
+          <p className="text-white py-2">{activePlan.name}</p>
+          <button
+            onClick={goToPlanDetails}
+            className="bg-[#7A1218] text-[#FFFFFF] w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4"
+          >
+            Plan Overview
+          </button>
+        </div>
+      )}
 
       {/* NEXT WORKOUT DIV */}
       <div className="bg-[#14141A] rounded-2xl p-4">
-        {activePlan?.completedAt ? (
+        {!activePlan ? (
+          <>
+            <p className="text-white pb-1">Ready to get started?</p>
+            <p className="text-[#9AA0AA] text-sm pb-4">
+              Create a plan to begin tracking your workouts.
+            </p>
+            <button
+              onClick={() => navigate("/plans")}
+              className="bg-[#7A1218] text-white w-1/2 px-10 py-4 rounded-2xl cursor-pointer"
+            >
+              Create a Plan
+            </button>
+          </>
+        ) : activePlan?.completedAt ? (
           <>
             <p className="text-green-400 font-semibold pb-1">Plan Complete!</p>
             <p className="text-white pb-1">
@@ -161,6 +176,20 @@ const Dashboard = () => {
               Go to workout
             </button>
           </>
+        ) : completedSessions.length === 0 ? (
+          <>
+            <p className="text-[#9AA0AA] py-4">Next workout</p>
+            <p className="text-white pb-2">Ready to start?</p>
+            <p className="text-[#9AA0AA] pb-4">
+              Head to your plan overview to begin your first workout.
+            </p>
+            <button
+              onClick={goToPlanDetails}
+              className="bg-[#7A1218] text-white w-1/2 px-10 py-4 rounded-2xl cursor-pointer"
+            >
+              Plan Overview
+            </button>
+          </>
         ) : (
           <>
             <p className="text-[#9AA0AA] py-4">Next workout</p>
@@ -179,20 +208,24 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Sessions */}
-      <p className="text-white pb-2 my-6">Recent sessions</p>
-      {completedSessions.map((s) => (
-        <div className="bg-[#14141A] rounded-2xl p-4 mb-4" key={s._id}>
-          <p className="text-white pb-2"> {s.title} </p>
-          <p className="text-white pb-2">
-            Completed:{" "}
-            {new Date(s.completedAt).toLocaleDateString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-              year: "2-digit",
-            })}
-          </p>
-        </div>
-      ))}
+      {activePlan && (
+        <>
+          <p className="text-white pb-2 my-6">Recent sessions</p>
+          {completedSessions.map((s) => (
+            <div className="bg-[#14141A] rounded-2xl p-4 mb-4" key={s._id}>
+              <p className="text-white pb-2"> {s.title} </p>
+              <p className="text-white pb-2">
+                Completed:{" "}
+                {new Date(s.completedAt).toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "2-digit",
+                })}
+              </p>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 };

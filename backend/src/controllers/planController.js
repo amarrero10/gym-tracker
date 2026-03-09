@@ -93,19 +93,18 @@ export const deletePlan = async (req, res) => {
     const { id } = req.params;
     const { userId } = req.user;
 
-    console.log(id, userId);
+    const plan = await Plan.findOneAndDelete({ _id: id, userId });
 
-    const plan = await Plan.findByIdAndDelete(id);
-
-    if (plan.deletedCount === 1) {
-      res
-        .status(200)
-        .json({ message: `Plan has been deleted: ${plan.deletedCount} ` });
-    } else {
-      res.status(400).json({ message: "Error deleting Plan" });
+    if (!plan) {
+      return res.status(404).json({ message: "Plan not found" });
     }
+
+    await Session.deleteMany({ planId: id, userId });
+
+    res.status(200).json({ message: "Plan and related sessions deleted" });
   } catch (error) {
-    console.error("Problem getting results, ", error);
+    console.error("Problem deleting plan:", error);
+    res.status(500).json({ message: "Error deleting plan" });
   }
 };
 
