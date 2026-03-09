@@ -5,7 +5,9 @@ export default function ProtectedLayout() {
   return (
     <>
       <NavBar />
-      <Outlet />
+      <div className="pb-24">
+        <Outlet />
+      </div>
     </>
   );
 }

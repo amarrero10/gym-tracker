@@ -75,6 +75,23 @@ const Dashboard = () => {
     navigate(`/session/${activeSession?._id}`);
   };
 
+  const completePlan = async () => {
+    try {
+      await api.patch(
+        `/plans/${activePlan._id}`,
+        { completedAt: new Date(), isActive: false },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      setActivePlan((prev) => ({
+        ...prev,
+        completedAt: new Date(),
+        isActive: false,
+      }));
+    } catch (error) {
+      console.error("Error completing plan:", error);
+    }
+  };
+
   if (error)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
@@ -114,23 +131,57 @@ const Dashboard = () => {
 
       {/* NEXT WORKOUT DIV */}
       <div className="bg-[#14141A] rounded-2xl p-4">
-        <p className="text-[#9AA0AA] py-4">Next workout</p>
-        <p className="text-white pb-2">{activeSession?.title}</p>
-        <p className="text-[#9AA0AA]">
-          {activeSession?.exercises.length} exercises
-        </p>
-        <button
-          onClick={goToSession}
-          className="bg-[#7A1218] text-[#FFFFFF]  w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4"
-        >
-          Go to workout
-        </button>
+        {activePlan?.completedAt ? (
+          <>
+            <p className="text-green-400 font-semibold pb-1">Plan Complete!</p>
+            <p className="text-white pb-1">
+              You crushed it! {activePlan.name} is done.
+            </p>
+            <p className="text-[#9AA0AA] text-sm pb-4">
+              Head to Plans to start your next one.
+            </p>
+            <button
+              onClick={() => navigate("/plans")}
+              className="bg-[#7A1218] text-white w-1/2 px-10 py-4 rounded-2xl cursor-pointer"
+            >
+              Start New Plan
+            </button>
+          </>
+        ) : activeSession ? (
+          <>
+            <p className="text-[#9AA0AA] py-4">Next workout</p>
+            <p className="text-white pb-2">{activeSession.title}</p>
+            <p className="text-[#9AA0AA]">
+              {activeSession.exercises.length} exercises
+            </p>
+            <button
+              onClick={goToSession}
+              className="bg-[#7A1218] text-[#FFFFFF] w-1/2 px-10 py-4 rounded-2xl cursor-pointer mt-4"
+            >
+              Go to workout
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="text-[#9AA0AA] py-4">Next workout</p>
+            <p className="text-white pb-2">All workouts completed!</p>
+            <p className="text-[#9AA0AA] pb-4">
+              You've finished all sessions in your current plan.
+            </p>
+            <button
+              onClick={completePlan}
+              className="bg-[#7A1218] text-white w-1/2 px-10 py-4 rounded-2xl cursor-pointer"
+            >
+              Complete Plan
+            </button>
+          </>
+        )}
       </div>
 
       {/* Recent Sessions */}
       <p className="text-white pb-2 my-6">Recent sessions</p>
       {completedSessions.map((s) => (
-        <div className="bg-[#14141A] rounded-2xl p-4" key={s._id}>
+        <div className="bg-[#14141A] rounded-2xl p-4 mb-4" key={s._id}>
           <p className="text-white pb-2"> {s.title} </p>
           <p className="text-white pb-2">
             Completed:{" "}

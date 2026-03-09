@@ -7,6 +7,7 @@ import ProtectedLayout from "./components/ProtectedLayout";
 import PlanDetail from "./pages/PlanDetail";
 import Session from "./pages/Session";
 import Set from "./pages/Set";
+import EditSet from "./pages/EditSet";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/plans/:id" element={<PlanDetail />} />
             <Route path="/session/:id" element={<Session />} />
             <Route path="/session/:sessionId/set/:setId/exercise/:exerciseId" element={<Set />} />
+            <Route path="/session/:sessionId/exercise/:sessionExerciseId/edit" element={<EditSet />} />
           </Route>
         </Route>
       </Routes>

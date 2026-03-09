@@ -37,10 +37,24 @@ const UseTimer = ({ repSeconds = 10, repIsRunning = false }) => {
   };
 
   return (
-    <div className=" text-white">
-      <h1>{seconds}s</h1>
-      <button onClick={startStop}>{isRunning ? "Pause" : "Start"}</button>
-      <button onClick={reset}>Reset</button>
+    <div className="bg-zinc-900 rounded-2xl px-4 py-4 mt-4 font-sans">
+      <div className="text-zinc-400 text-sm mb-2">Rest Timer</div>
+      <div className="text-white text-4xl font-bold text-center mb-4">{seconds}s</div>
+      <div className="flex gap-3">
+        <button
+          onClick={startStop}
+          disabled={seconds <= 0}
+          className="flex-1 py-2 rounded-xl text-white font-semibold bg-red-900 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {isRunning ? "Pause" : "Start"}
+        </button>
+        <button
+          onClick={reset}
+          className="flex-1 py-2 rounded-xl text-white font-semibold border border-zinc-700"
+        >
+          Reset
+        </button>
+      </div>
     </div>
   );
 };

@@ -87,6 +87,9 @@ const planSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
+    completedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
