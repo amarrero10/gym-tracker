@@ -42,9 +42,7 @@ const Session = () => {
           String(e.exerciseId?._id ?? e.exerciseId ?? e._id),
         );
 
-        const results = await Promise.all(
-          exerciseIds.map((id) => api.get(`/exercises/${id}`)),
-        );
+        const results = await Promise.all(exerciseIds.map((id) => api.get(`/exercises/${id}`)));
 
         const exerciseDetails = results.map((r) => r.data);
 
@@ -62,8 +60,8 @@ const Session = () => {
 
   console.log("EXERCISES", exerciseDetails);
 
-  const goToSet = (exerciseId) => {
-    navigate(`/session/set/${session?._id}/exercise/${exerciseId}`);
+  const goToSet = (setId, exerciseId) => {
+    navigate(`/session/${session?._id}/set/${setId}/exercise/${exerciseId}`);
   };
 
   if (error)
@@ -91,17 +89,14 @@ const Session = () => {
       {exerciseDetails.map((e, i) => (
         <div className="bg-[#14141A] rounded-2xl p-4 mb-4" key={e._id}>
           <p className=" text-white"> {e.name} </p>
-          <p className="text-[#9AA0AA]">
-            {session?.exercises[i].targetSets} sets
-          </p>
+          <p className="text-[#9AA0AA]">{session?.exercises[i].targetSets} sets</p>
           <p className="text-[#9AA0AA]">
             {" "}
-            {session?.exercises[i].targetRepsMin} -{" "}
-            {session?.exercises[i].targetRepsMax} reps
+            {session?.exercises[i].targetRepsMin} - {session?.exercises[i].targetRepsMax} reps
           </p>
           <button
             disabled={!session?._id}
-            onClick={() => session?._id && goToSet(e._id)}
+            onClick={() => session?._id && goToSet(session?.exercises[i]._id, e._id)}
             className="text-[#9AA0AA]"
           >
             Log →

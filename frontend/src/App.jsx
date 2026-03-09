@@ -19,10 +19,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/plans/:id" element={<PlanDetail />} />
             <Route path="/session/:id" element={<Session />} />
-            <Route
-              path="/session/set/:sessionId/exercise/:exerciseId"
-              element={<Set />}
-            />
+            <Route path="/session/:sessionId/set/:setId/exercise/:exerciseId" element={<Set />} />
           </Route>
         </Route>
       </Routes>

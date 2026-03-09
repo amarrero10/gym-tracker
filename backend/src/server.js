@@ -12,8 +12,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error(
-      "Failed to start server due to database connection issues:",
-      err,
-    );
+    console.error("Failed to start server due to database connection issues:", err);
   });
