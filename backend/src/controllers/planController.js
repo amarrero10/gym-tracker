@@ -15,7 +15,7 @@ export const getAllPlans = async (req, res) => {
 
 export const createPlan = async (req, res) => {
   try {
-    const { name, weeksCount, daysPerWeek, weeks } = req.body;
+    const { name, weeksCount, daysPerWeek, weeks, isActive } = req.body;
     const { userId } = req.user;
 
     const newPlan = new Plan({
@@ -24,6 +24,7 @@ export const createPlan = async (req, res) => {
       daysPerWeek,
       weeks,
       userId,
+      isActive: isActive ?? false,
     });
 
     await newPlan.save();

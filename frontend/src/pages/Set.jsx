@@ -12,6 +12,7 @@ const Set = () => {
   const [error, setError] = useState(null);
   const [sets, setSets] = useState([]);
   const [completedSets, setCompletedSets] = useState([]);
+  const [extraSets, setExtraSets] = useState(0);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -125,7 +126,7 @@ const Set = () => {
           <span>Weight</span>
           <span>Done</span>
         </div>
-        {Array.from({ length: set?.targetSets }, (_, i) => (
+        {Array.from({ length: (set?.targetSets ?? 0) + extraSets }, (_, i) => (
           <div
             key={i}
             className="grid grid-cols-4 mb-3 text-zinc-400 text-sm text-center"
@@ -164,14 +165,20 @@ const Set = () => {
             </button>
           </div>
         ))}
+
+        <button
+          onClick={() => setExtraSets((n) => n + 1)}
+          className="w-full mt-1 mb-1 py-2 text-zinc-400 text-sm border border-zinc-700 rounded-xl"
+        >
+          + Add Set
+        </button>
       </div>
-      <div className=" bg-zinc-900"></div>
 
       <button
         onClick={completeExercise}
         disabled={
-          completedSets.filter(Boolean).length < set?.targetSets ||
-          sets.length < set?.targetSets ||
+          completedSets.filter(Boolean).length < (set?.targetSets ?? 0) + extraSets ||
+          sets.length < (set?.targetSets ?? 0) + extraSets ||
           sets.some((s) => !s?.weight || !s?.reps)
         }
         className="mt-4 w-full py-3 rounded-xl text-white font-semibold bg-red-900 disabled:opacity-40 disabled:cursor-not-allowed"

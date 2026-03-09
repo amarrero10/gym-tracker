@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
 import { useNavigate } from "react-router";
@@ -15,25 +15,29 @@ const Dashboard = () => {
   const [activeSession, setActiveSession] = useState(null);
   const [completedSessions, setCompletedSessions] = useState([]);
 
-  useEffect(() => {
-    const getPlans = async () => {
-      try {
-        const res = await api.get("/plans", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setPlans(res.data);
-
-        setLoading(false);
-      } catch (error) {
-        setError(error);
-      }
-    };
-
-    getPlans();
+  const getPlans = useCallback(async () => {
+    try {
+      const res = await api.get("/plans", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPlans(res.data);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+    }
   }, [token]);
+
+  useEffect(() => {
+    getPlans();
+  }, [getPlans]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") getPlans();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [getPlans]);
 
   useEffect(() => {
     const date = new Date();
