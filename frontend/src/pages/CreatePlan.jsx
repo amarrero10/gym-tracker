@@ -132,6 +132,23 @@ const CreatePlan = () => {
     closeAddExercise();
   };
 
+  const copyWeek1ToAll = () => {
+    setWeeks((prev) => {
+      const week1Days = prev[0].days;
+      return prev.map((week, wi) => {
+        if (wi === 0) return week;
+        return {
+          ...week,
+          days: week.days.map((day, di) => ({
+            ...day,
+            title: week1Days[di]?.title ?? day.title,
+            exercises: (week1Days[di]?.exercises ?? []).map((ex) => ({ ...ex })),
+          })),
+        };
+      });
+    });
+  };
+
   const removeExercise = (wi, di, ei) => {
     setWeeks((prev) => {
       const next = prev.map((w) => ({ ...w, days: w.days.map((d) => ({ ...d, exercises: [...d.exercises] })) }));
@@ -455,6 +472,14 @@ const CreatePlan = () => {
               )}
             </div>
           ))}
+        {wi === 0 && Number(weeksCount) > 1 && (
+          <button
+            onClick={copyWeek1ToAll}
+            className="w-full py-2 mb-2 rounded-xl text-sm text-white border border-zinc-700 hover:border-zinc-500"
+          >
+            Copy Week 1 to all weeks →
+          </button>
+        )}
         </div>
       ))}
 
