@@ -40,8 +40,6 @@ export const getExercise = async (req, res) => {
       return null;
     }
 
-    console.log("Exercise found: ", exercise);
-
     res.status(200).json(exercise);
   } catch (error) {
     console.error("Error fetching exercise: ", error);
@@ -62,7 +60,6 @@ export const createExercise = async (req, res) => {
     await newExercise.save();
 
     res.status(201).json({ message: "Exercise created!" });
-    console.log(name, movementPattern);
   } catch (error) {
     console.error("Problem getting results: ", error);
     res.status(500).json({ message: "Error creating exercise" });

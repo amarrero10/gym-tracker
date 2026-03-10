@@ -114,8 +114,6 @@ export const getProgress = async (req, res) => {
     const { planId } = req.params;
     const { userId } = req.user;
 
-    console.log(planId);
-
     if (!planId) {
       return res.status(400).json({ message: "planId is required" });
     }
