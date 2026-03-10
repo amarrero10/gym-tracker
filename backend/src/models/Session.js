@@ -58,6 +58,10 @@ const sessionExerciseSchema = new mongoose.Schema({
     type: String,
   },
   sets: [sessionSetsSchema],
+  skipped: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const workoutSessionSchema = new mongoose.Schema(

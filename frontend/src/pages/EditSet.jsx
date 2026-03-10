@@ -38,6 +38,20 @@ const EditSet = () => {
     });
   };
 
+  const deleteSet = async (setId) => {
+    try {
+      await api.delete(
+        `/sessions/${sessionId}/exercises/${sessionExerciseId}/sets/${setId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      setSets((prev) => prev.filter((s) => s._id !== setId));
+      toast.success("Set removed.");
+    } catch (err) {
+      console.error("Error deleting set:", err);
+      toast.error("Failed to remove set.");
+    }
+  };
+
   const saveChanges = async () => {
     try {
       for (const s of sets) {
@@ -77,37 +91,53 @@ const EditSet = () => {
         {exercise?.targetSets} sets • {exercise?.targetRepsMin}-{exercise?.targetRepsMax} reps
       </div>
 
-      <div className="bg-zinc-900 rounded-2xl px-2 py-2 font-sans text-white">
-        <div className="grid grid-cols-4 mb-3 text-zinc-400 text-sm text-center">
-          <span>Set</span>
-          <span>Weight</span>
-          <span>Reps</span>
-          <span>Done</span>
+      {sets.length === 0 ? (
+        <div className="bg-zinc-900 rounded-2xl px-4 py-6 text-center">
+          <p className="text-zinc-400 text-sm">No sets logged.</p>
         </div>
-        {sets.map((s, i) => (
-          <div key={s._id} className="grid grid-cols-4 mb-3 text-zinc-400 text-sm text-center">
-            <span className="text-zinc-400 text-sm">{i + 1}</span>
-            <input
-              type="number"
-              value={s.weight ?? ""}
-              onChange={(e) => updateSet(i, "weight", e.target.value)}
-              className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center py-2 mr-2 outline-none"
-            />
-            <input
-              type="number"
-              value={s.reps ?? ""}
-              onChange={(e) => updateSet(i, "reps", e.target.value)}
-              className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center py-2 outline-none"
-            />
-            <button
-              className={`${s.isCompleted ? "bg-red-900 border border-zinc-700 rounded-xl w-10 h-10 flex items-center justify-center text-white mx-auto" : "border border-zinc-700 rounded-xl w-10 h-10 flex items-center justify-center mx-auto"}`}
-              onClick={() => updateSet(i, "isCompleted", !s.isCompleted)}
-            >
-              {s.isCompleted ? "✓" : " "}
-            </button>
+      ) : (
+        <div className="bg-zinc-900 rounded-2xl px-2 py-2 font-sans text-white">
+          <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2rem] mb-3 text-zinc-400 text-sm text-center gap-1">
+            <span>Set</span>
+            <span>Weight</span>
+            <span>Reps</span>
+            <span>Done</span>
+            <span></span>
           </div>
-        ))}
-      </div>
+          {sets.map((s, i) => (
+            <div
+              key={s._id}
+              className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2rem] mb-3 text-zinc-400 text-sm text-center gap-1 items-center"
+            >
+              <span className="text-zinc-400 text-sm">{i + 1}</span>
+              <input
+                type="number"
+                value={s.weight ?? ""}
+                onChange={(e) => updateSet(i, "weight", e.target.value)}
+                className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center py-2 outline-none"
+              />
+              <input
+                type="number"
+                value={s.reps ?? ""}
+                onChange={(e) => updateSet(i, "reps", e.target.value)}
+                className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center py-2 outline-none"
+              />
+              <button
+                className={`${s.isCompleted ? "bg-red-900 border border-zinc-700 rounded-xl w-10 h-10 flex items-center justify-center text-white mx-auto" : "border border-zinc-700 rounded-xl w-10 h-10 flex items-center justify-center mx-auto"}`}
+                onClick={() => updateSet(i, "isCompleted", !s.isCompleted)}
+              >
+                {s.isCompleted ? "✓" : " "}
+              </button>
+              <button
+                onClick={() => deleteSet(s._id)}
+                className="text-zinc-500 hover:text-red-400 text-lg leading-none cursor-pointer"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex gap-3 mt-4">
         <button
@@ -118,7 +148,8 @@ const EditSet = () => {
         </button>
         <button
           onClick={saveChanges}
-          className="flex-1 py-3 rounded-xl text-white font-semibold bg-red-900"
+          disabled={sets.length === 0}
+          className="flex-1 py-3 rounded-xl text-white font-semibold bg-red-900 disabled:opacity-40"
         >
           Save Changes
         </button>

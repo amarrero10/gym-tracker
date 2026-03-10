@@ -317,6 +317,100 @@ export const getSession = async (req, res) => {
   }
 };
 
+export const getAllSessions = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    if (!userId) {
+      return res.status(403).json({ message: "Must be logged in." });
+    }
+
+    const sessions = await Session.find({ userId })
+      .populate("planId", "name")
+      .populate("exercises.exerciseId", "name")
+      .sort({ weekNumber: "asc", dayNumber: "asc" });
+
+    return res.status(200).json({ sessions });
+  } catch (error) {
+    console.error("Error fetching all sessions:", error);
+    return res.status(500).json({ message: "Error fetching sessions" });
+  }
+};
+
+export const skipExercise = async (req, res) => {
+  try {
+    const { sessionId, sessionExerciseId } = req.params;
+    const { userId } = req.user;
+
+    const session = await Session.findOne({ _id: sessionId, userId });
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    const exercise = session.exercises.id(sessionExerciseId);
+    if (!exercise) return res.status(404).json({ message: "Exercise not found" });
+
+    exercise.skipped = true;
+    await session.save();
+
+    return res.status(200).json(session);
+  } catch (error) {
+    console.error("Error skipping exercise:", error);
+    return res.status(500).json({ message: "Error skipping exercise" });
+  }
+};
+
+export const substituteExercise = async (req, res) => {
+  try {
+    const { sessionId, sessionExerciseId } = req.params;
+    const { newExerciseId } = req.body;
+    const { userId } = req.user;
+
+    if (!newExerciseId) {
+      return res.status(400).json({ message: "newExerciseId is required" });
+    }
+
+    const session = await Session.findOne({ _id: sessionId, userId });
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    const exercise = session.exercises.id(sessionExerciseId);
+    if (!exercise) return res.status(404).json({ message: "Exercise not found" });
+
+    exercise.exerciseId = newExerciseId;
+    exercise.sets = [];
+    exercise.skipped = false;
+    await session.save();
+
+    return res.status(200).json(session);
+  } catch (error) {
+    console.error("Error substituting exercise:", error);
+    return res.status(500).json({ message: "Error substituting exercise" });
+  }
+};
+
+export const removeSet = async (req, res) => {
+  try {
+    const { sessionId, sessionExerciseId, setId } = req.params;
+    const { userId } = req.user;
+
+    const session = await Session.findOne({ _id: sessionId, userId });
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    const exercise = session.exercises.id(sessionExerciseId);
+    if (!exercise) return res.status(404).json({ message: "Exercise not found" });
+
+    const setIndex = exercise.sets.findIndex((s) => s._id.toString() === setId);
+    if (setIndex === -1) return res.status(404).json({ message: "Set not found" });
+
+    exercise.sets.splice(setIndex, 1);
+    exercise.sets.forEach((s, i) => { s.setNumber = i + 1; });
+    await session.save();
+
+    return res.status(200).json(session);
+  } catch (error) {
+    console.error("Error removing set:", error);
+    return res.status(500).json({ message: "Error removing set" });
+  }
+};
+
 export const getCompletedSessions = async (req, res) => {
   try {
     const { planId } = req.query;

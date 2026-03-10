@@ -18,7 +18,7 @@ export default function Navbar() {
         className={({ isActive }) =>
           `${isActive ? "  text-sm underline decoration-[#7A1218] underline-offset-8" : ""}`
         }
-        to="/session/"
+        to="/session"
       >
         Workout
       </NavLink>

@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import api from "../api/axios";
 
 const PlanDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [plan, setPlan] = useState(null);
   const [exerciseMap, setExerciseMap] = useState({});
   const [completedMap, setCompletedMap] = useState({});
+  const [inProgressMap, setInProgressMap] = useState({});
+  const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openWeeks, setOpenWeeks] = useState({});
@@ -30,9 +33,11 @@ const PlanDetail = () => {
           ),
         ];
 
-        const [exerciseResults, completedRes] = await Promise.all([
+        const [exerciseResults, completedRes, sessionsRes, progressRes] = await Promise.all([
           Promise.all(exerciseIds.map((eid) => api.get(`/exercises/${eid}`, { headers }))),
           api.get(`/sessions/completed-sessions?planId=${id}`, { headers }),
+          api.get(`/sessions`, { headers }),
+          api.get(`/plans/${id}/progress`, { headers }),
         ]);
 
         // Build exerciseId -> exercise name map
@@ -49,6 +54,19 @@ const PlanDetail = () => {
           cMap[s.weekNumber][s.dayNumber] = true;
         }
         setCompletedMap(cMap);
+
+        // Build { weekNumber: { dayNumber: sessionId } } map from in-progress sessions for this plan
+        const ipMap = {};
+        const planSessions = (sessionsRes.data.sessions ?? []).filter(
+          (s) => (s.planId?._id ?? s.planId) === id && s.status === "in_progress"
+        );
+        for (const s of planSessions) {
+          if (!ipMap[s.weekNumber]) ipMap[s.weekNumber] = {};
+          ipMap[s.weekNumber][s.dayNumber] = s._id;
+        }
+        setInProgressMap(ipMap);
+
+        setProgress(progressRes.data);
       } catch (err) {
         setError(err);
       } finally {
@@ -107,6 +125,22 @@ const PlanDetail = () => {
         </span>
       </div>
 
+      {/* Progress bar */}
+      {progress && (
+        <div className="mb-6">
+          <div className="w-full bg-[#2A2A33] rounded-full h-2 mb-2">
+            <div
+              className="bg-[#7A1218] h-2 rounded-full transition-all"
+              style={{ width: `${progress.completedPercent}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-[#9AA0AA]">
+            <span>{progress.completedCount} of {progress.totalDays} sessions done</span>
+            <span>{progress.completedPercent}%</span>
+          </div>
+        </div>
+      )}
+
       <hr className="h-px border-0 mb-6 bg-[#2A2A33]" />
 
       {/* Weeks */}
@@ -135,6 +169,18 @@ const PlanDetail = () => {
                         <span className="text-xs text-green-400 border border-green-400 rounded-full px-2 py-0.5">
                           Completed
                         </span>
+                      ) : inProgressMap[week.weekNumber]?.[day.dayNumber] ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-[#7A1218] border border-[#7A1218] rounded-full px-2 py-0.5">
+                            In Progress
+                          </span>
+                          <button
+                            onClick={() => navigate(`/session/${inProgressMap[week.weekNumber][day.dayNumber]}`)}
+                            className="text-xs bg-[#7A1218] text-white rounded-full px-3 py-0.5 cursor-pointer"
+                          >
+                            Begin
+                          </button>
+                        </div>
                       ) : (
                         <span className="text-xs text-zinc-500 border border-zinc-700 rounded-full px-2 py-0.5">
                           Not done

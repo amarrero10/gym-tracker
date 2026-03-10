@@ -1,8 +1,9 @@
-import api from "../api/axios"; // baseURL "/api"
+import api from "../api/axios";
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { ShieldUser, LockKeyhole, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ShieldUser, LockKeyhole, UserRound } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
+import logo from "../assets/logo.png";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -26,13 +27,7 @@ export default function Register() {
 
     try {
       setLoading(true);
-
-      const res = await api.post("/auth/register", {
-        username,
-        password,
-        displayName,
-      });
-
+      const res = await api.post("/auth/register", { username, password, displayName });
       login(res.data.token, res.data.user);
       navigate("/", { replace: true });
     } catch (error) {
@@ -47,94 +42,99 @@ export default function Register() {
 
   return (
     <div className="h-screen w-screen flex items-center justify-center">
-      <div className="flex flex-col h-1/2 w-1/4 items-center rounded-3xl shadow-2xl">
-        <div className="p-4 bg-gray-500/20 rounded-full mt-6">
-          <UserPlus className="h-10 w-10" />
-        </div>
-
-        <h2 className="text-2xl py-6">Create an account</h2>
+      <div className="flex flex-col w-screen h-screen items-center">
+        <img className="h-27.5 mt-10" src={logo} alt="Atlas logo" />
+        <p className="text-[12px] text-[#9AA0AA]">Track lifts. Hit PRs. Stay consistent.</p>
+        <hr className="w-87.5 h-px border-0 my-4 bg-[#2A2A33]" />
 
         {errMsg && (
-          <div className="w-4/5 mb-4 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-red-700">
-            {errMsg}
+          <div className="w-full px-4 mb-3">
+            <div className="rounded-xl border border-red-400 bg-red-400/10 px-3 py-2 text-red-400 text-sm">
+              {errMsg}
+            </div>
           </div>
         )}
 
-        <form
-          className="w-full flex flex-col items-center gap-5"
-          onSubmit={handleSubmit}
-        >
-          <div className="relative flex items-center">
-            <ShieldUser className="pointer-events-none absolute left-3 h-5 w-5 text-gray-400" />
-            <input
-              className="rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 shadow-sm
-                         focus:border-indigo-500 focus:ring-indigo-500 sm:text-md"
-              placeholder="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              autoComplete="username"
-            />
-          </div>
+        <div className="w-screen px-4">
+          <form className="flex flex-col gap-5 pt-2 pb-6" onSubmit={handleSubmit}>
+            <div className="bg-[#14141A] rounded-2xl p-4">
+              <p className="text-[#F5F6F7] text-[12px] pb-2">Create an account</p>
+              <p className="text-[#9AA0AA] text-[12px] pb-4">
+                Start tracking your workouts today.
+              </p>
 
-          <div className="relative flex items-center">
-            <ShieldUser className="pointer-events-none absolute left-3 h-5 w-5 text-gray-400" />
-            <input
-              className="rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 shadow-sm
-                         focus:border-indigo-500 focus:ring-indigo-500 sm:text-md"
-              placeholder="display name"
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              autoComplete="name"
-            />
-          </div>
+              <div className="relative flex items-center pb-4">
+                <ShieldUser className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+                <input
+                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
+                  placeholder="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  autoComplete="username"
+                />
+              </div>
 
-          <div className="relative flex items-center">
-            <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-gray-400" />
-            <input
-              className="rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 shadow-sm
-                         focus:border-indigo-500 focus:ring-indigo-500 sm:text-md"
-              placeholder="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-              minLength={8}
-            />
-          </div>
+              <div className="relative flex items-center pb-4">
+                <UserRound className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+                <input
+                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
+                  placeholder="display name (optional)"
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  autoComplete="name"
+                />
+              </div>
 
-          <div className="relative flex items-center">
-            <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-gray-400" />
-            <input
-              className="rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 shadow-sm
-                         focus:border-indigo-500 focus:ring-indigo-500 sm:text-md"
-              placeholder="confirm password"
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-              autoComplete="new-password"
-              minLength={8}
-            />
-          </div>
+              <div className="relative flex items-center pb-4">
+                <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+                <input
+                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
+                  placeholder="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  minLength={8}
+                />
+              </div>
 
+              <div className="relative flex items-center">
+                <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+                <input
+                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
+                  placeholder="confirm password"
+                  type="password"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  minLength={8}
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-[#7A1218] text-[#FFFFFF] text-[12px] px-10 py-4 rounded-2xl cursor-pointer disabled:opacity-50"
+            >
+              {loading ? "Creating account..." : "Create Account"}
+            </button>
+          </form>
+        </div>
+
+        <div className="px-4 w-screen">
           <button
-            disabled={loading}
-            className="bg-slate-200 px-10 py-2 rounded-lg cursor-pointer disabled:opacity-50"
+            onClick={() => navigate("/login", { replace: true })}
+            className="border-[#2A2A33] border-2 w-full text-[#FFFFFF] text-[12px] px-10 py-4 rounded-2xl cursor-pointer"
           >
-            {loading ? "Creating..." : "Register"}
+            Already have an account? Sign In
           </button>
-
-          <p className="text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link className="text-indigo-600 hover:underline" to="/login">
-              Sign in
-            </Link>
-          </p>
-        </form>
+        </div>
       </div>
     </div>
   );

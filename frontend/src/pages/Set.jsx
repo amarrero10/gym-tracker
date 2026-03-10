@@ -3,6 +3,7 @@ import UseTimer from "../components/UseTimer";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import toast, { Toaster } from "react-hot-toast";
+import { ChevronLeft } from "lucide-react";
 
 const Set = () => {
   const { sessionId, setId, exerciseId } = useParams();
@@ -12,7 +13,7 @@ const Set = () => {
   const [error, setError] = useState(null);
   const [sets, setSets] = useState([]);
   const [completedSets, setCompletedSets] = useState([]);
-  const [extraSets, setExtraSets] = useState(0);
+  const [rowCount, setRowCount] = useState(0);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -21,12 +22,12 @@ const Set = () => {
     const getSession = async () => {
       try {
         const res = await api.get(`/sessions/${sessionId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         setSession(res.data);
+
+        const ex = res.data.exercises.find((e) => e._id === setId);
+        if (ex) setRowCount(ex.targetSets);
 
         setLoading(false);
       } catch (error) {
@@ -35,27 +36,22 @@ const Set = () => {
     };
 
     getSession();
-  }, [token, sessionId]);
+  }, [token, sessionId, setId]);
 
   useEffect(() => {
     if (!session?._id) return;
-    const getExercises = async () => {
+    const getExercise = async () => {
       try {
         const res = await api.get(`/exercises/${exerciseId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         setExercise(res.data);
-
         setLoading(false);
       } catch (error) {
         setError(error);
       }
     };
-
-    getExercises();
+    getExercise();
   }, [token, exerciseId, session?._id]);
 
   const set = session?.exercises.find((e) => e._id === setId);
@@ -66,6 +62,12 @@ const Set = () => {
       next[i] = { ...next[i], [field]: value };
       return next;
     });
+  };
+
+  const removeRow = (i) => {
+    setSets((prev) => prev.filter((_, idx) => idx !== i));
+    setCompletedSets((prev) => prev.filter((_, idx) => idx !== i));
+    setRowCount((n) => Math.max(0, n - 1));
   };
 
   const completeExercise = async () => {
@@ -85,109 +87,162 @@ const Set = () => {
       setSets([]);
       setCompletedSets([]);
       toast.success("Set Completed!", { icon: "💪" });
-      setTimeout(() => navigate(-1), 1500);
+      setTimeout(() => navigate(`/session/${sessionId}`), 1500);
     } catch (error) {
       console.error("Error saving sets:", error);
     }
   };
 
+  const isComplete =
+    rowCount > 0 &&
+    completedSets.filter(Boolean).length >= rowCount &&
+    sets.length >= rowCount &&
+    !sets.some((s) => !s?.weight || !s?.reps);
+
   if (error)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className=" text-white">Error: {error.message}</div>
+        <div className="text-white">Error: {error.message}</div>
       </div>
     );
   if (loading)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin" />
+        <div className="h-12 w-12 border-4 border-t-4 border-[#7A1218] rounded-full animate-spin" />
       </div>
     );
 
   return (
-    <div className=" px-4 mt-10">
-      <div className=" text-white">{exercise?.name}</div>
-      <div>
-        <p className=" text-[#9AA0AA]">
-          Target: {set?.targetSets} {set?.targetSets > 1 ? "sets" : "set"} •{" "}
-          {set?.targetRepsMin}-{set?.targetRepsMax} reps
-        </p>
-      </div>
-      {set?.restSeconds && (
-        <div>
-          <p className=" text-[#9AA0AA]">Rest: {set?.restSeconds} sec</p>
-        </div>
-      )}
-
-      <div className="bg-zinc-900 rounded-2xl px-2 py-2 font-sans text-white mt-6">
-        <div className="grid grid-cols-4 mb-3 text-zinc-400 text-sm text-center">
-          <span>Set</span>
-          <span>Reps</span>
-          <span>Weight</span>
-          <span>Done</span>
-        </div>
-        {Array.from({ length: (set?.targetSets ?? 0) + extraSets }, (_, i) => (
-          <div
-            key={i}
-            className="grid grid-cols-4 mb-3 text-zinc-400 text-sm text-center"
-          >
-            <span className="text-zinc-400 text-sm">{i + 1}</span>
-
-            <input
-              type="number"
-              name="reps"
-              value={sets[i]?.reps ?? ""}
-              onChange={(e) => updateSet(i, "reps", e.target.value)}
-              placeholder="0"
-              className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center py-2 mr-2 outline-none"
-            />
-
-            <input
-              type="number"
-              placeholder="0"
-              name="weight"
-              value={sets[i]?.weight ?? ""}
-              onChange={(e) => updateSet(i, "weight", e.target.value)}
-              className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center py-2 outline-none"
-            />
-
-            <button
-              className={`${completedSets[i] ? "bg-red-900 border border-zinc-700 rounded-xl w-10 h-10 flex items-center justify-center text-white mx-auto" : "border-bg-slate-400 border rounded-xl w-10 h-10 flex items-center justify-center mx-auto"}`}
-              onClick={() => {
-                setCompletedSets((prev) => {
-                  const next = [...prev];
-                  next[i] = !next[i];
-                  return next;
-                });
-              }}
-            >
-              {completedSets[i] ? "✓" : " "}
-            </button>
-          </div>
-        ))}
-
+    <div className="bg-[#0D0D12]">
+      {/* Header */}
+      <div className="px-4 pt-12 pb-4">
         <button
-          onClick={() => setExtraSets((n) => n + 1)}
-          className="w-full mt-1 mb-1 py-2 text-zinc-400 text-sm border border-zinc-700 rounded-xl"
+          onClick={() => navigate(`/session/${sessionId}`)}
+          className="flex items-center gap-1 text-[#9AA0AA] mb-4 cursor-pointer"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span className="text-sm">Back</span>
+        </button>
+
+        <h1 className="text-white text-xl font-semibold">{exercise?.name}</h1>
+
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
+          <span className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-full px-3 py-1">
+            {set?.targetSets} {set?.targetSets === 1 ? "set" : "sets"}
+          </span>
+          <span className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-full px-3 py-1">
+            {set?.targetRepsMin}–{set?.targetRepsMax} reps
+          </span>
+          {set?.restSeconds && (
+            <span className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-full px-3 py-1">
+              {set.restSeconds}s rest
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Set table */}
+      <div className="px-4 pb-6">
+        {/* Column headers */}
+        <div className="grid grid-cols-[2.5rem_1fr_1fr_3.5rem_2.5rem] gap-2 px-2 mb-2">
+          <span className="text-zinc-500 text-xs text-center">Set</span>
+          <span className="text-zinc-500 text-xs text-center">Reps</span>
+          <span className="text-zinc-500 text-xs text-center">Weight</span>
+          <span className="text-zinc-500 text-xs text-center">Done</span>
+          <span></span>
+        </div>
+
+        <div className="space-y-2">
+          {Array.from({ length: rowCount }, (_, i) => {
+            const isDone = completedSets[i];
+            return (
+              <div
+                key={i}
+                className={`grid grid-cols-[2.5rem_1fr_1fr_3.5rem_2.5rem] gap-2 items-center px-2 py-2 rounded-2xl transition-colors ${
+                  isDone ? "bg-[#7A1218]/20" : "bg-[#14141A]"
+                }`}
+              >
+                {/* Set number */}
+                <span
+                  className={`text-sm font-medium text-center ${isDone ? "text-[#7A1218]" : "text-zinc-400"}`}
+                >
+                  {i + 1}
+                </span>
+
+                {/* Reps input */}
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  name="reps"
+                  value={sets[i]?.reps ?? ""}
+                  onChange={(e) => updateSet(i, "reps", e.target.value)}
+                  placeholder="–"
+                  min="0"
+                  className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center text-base py-3 w-full outline-none focus:border-[#7A1218]"
+                />
+
+                {/* Weight input */}
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  name="weight"
+                  value={sets[i]?.weight ?? ""}
+                  onChange={(e) => updateSet(i, "weight", e.target.value)}
+                  placeholder="–"
+                  min="0"
+                  step="2.5"
+                  className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center text-base py-3 w-full outline-none focus:border-[#7A1218]"
+                />
+
+                {/* Done toggle */}
+                <button
+                  onClick={() =>
+                    setCompletedSets((prev) => {
+                      const next = [...prev];
+                      next[i] = !next[i];
+                      return next;
+                    })
+                  }
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-semibold transition-colors cursor-pointer ${
+                    isDone
+                      ? "bg-[#7A1218] text-white"
+                      : "border border-zinc-600 text-zinc-500"
+                  }`}
+                >
+                  {isDone ? "✓" : ""}
+                </button>
+
+                {/* Remove row */}
+                <button
+                  onClick={() => removeRow(i)}
+                  className="w-10 h-10 flex items-center justify-center text-zinc-500 text-xl cursor-pointer rounded-xl"
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Add set button */}
+        <button
+          onClick={() => setRowCount((n) => n + 1)}
+          className="mt-3 w-full py-4 text-[#9AA0AA] text-sm border border-zinc-700 rounded-2xl cursor-pointer"
         >
           + Add Set
         </button>
+
+        <button
+          onClick={completeExercise}
+          disabled={!isComplete}
+          className="mt-4 w-full py-4 rounded-2xl text-white text-base font-semibold bg-[#7A1218] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+        >
+          Complete Exercise
+        </button>
       </div>
 
-      <button
-        onClick={completeExercise}
-        disabled={
-          completedSets.filter(Boolean).length < (set?.targetSets ?? 0) + extraSets ||
-          sets.length < (set?.targetSets ?? 0) + extraSets ||
-          sets.some((s) => !s?.weight || !s?.reps)
-        }
-        className="mt-4 w-full py-3 rounded-xl text-white font-semibold bg-red-900 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Complete Exercise
-      </button>
-
       <UseTimer repSeconds={set?.restSeconds} />
-      <Toaster />
+      <Toaster position="top-center" />
     </div>
   );
 };
