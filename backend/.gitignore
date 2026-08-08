@@ -51,6 +51,9 @@ Thumbs.db
 # JetBrains
 .idea/
 
+# Vercel
+.vercel
+
 # Temporary files
 tmp/
 temp/
@@ -63,3 +66,4 @@ src/config/seed.js
 .env.local
 .env.development.local
 .env.production.local
+.env*
