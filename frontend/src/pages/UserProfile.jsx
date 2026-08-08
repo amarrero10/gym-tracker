@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronRight, Dumbbell } from "lucide-react";
 
 const UserProfile = () => {
   const { user, logout, updateUser } = useAuth();
@@ -157,6 +157,21 @@ const UserProfile = () => {
         <p className="font-mono text-[10px] text-[#9BA1A6] uppercase mb-1">Username</p>
         <p className="text-white text-sm">@{user?.username}</p>
       </div>
+
+      {/* Exercise library */}
+      <button
+        onClick={() => navigate("/exercises")}
+        className="w-full bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4 flex items-center justify-between cursor-pointer hover:border-[#D3131B] transition active:scale-[0.98]"
+      >
+        <div className="flex items-center gap-3">
+          <Dumbbell className="w-4 h-4 text-[#9BA1A6]" />
+          <div className="text-left">
+            <p className="text-white text-sm">Manage Exercises</p>
+            <p className="text-[#9BA1A6] text-xs mt-0.5">Browse, edit, and create exercises</p>
+          </div>
+        </div>
+        <ChevronRight className="w-4 h-4 text-[#9BA1A6]" />
+      </button>
 
       {/* Change password */}
       <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4 hover:border-[#D3131B] transition-colors">

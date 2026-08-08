@@ -1,4 +1,6 @@
 import Exercise from "../models/Exercise.js";
+import Plan from "../models/Plan.js";
+import Session from "../models/Session.js";
 
 export const getAllExercises = async (req, res) => {
   try {
@@ -36,14 +38,13 @@ export const getExercise = async (req, res) => {
     const exercise = await Exercise.findById(exerciseId);
 
     if (!exercise) {
-      console.log("No exercise with that id");
-      return null;
+      return res.status(404).json({ message: "Exercise not found" });
     }
 
     res.status(200).json(exercise);
   } catch (error) {
     console.error("Error fetching exercise: ", error);
-    throw error;
+    res.status(500).json({ message: "Error fetching exercise" });
   }
 };
 
@@ -59,8 +60,14 @@ export const createExercise = async (req, res) => {
 
     await newExercise.save();
 
-    res.status(201).json({ message: "Exercise created!" });
+    res.status(201).json({ message: "Exercise created!", exercise: newExercise });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "An exercise with this name already exists." });
+    }
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
     console.error("Problem getting results: ", error);
     res.status(500).json({ message: "Error creating exercise" });
   }
@@ -83,6 +90,9 @@ export const updateExercise = async (req, res) => {
 
     res.status(200).json(updated);
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ message: "An exercise with this name already exists." });
+    }
     res.status(400).json({ message: err.message });
   }
 };
@@ -91,13 +101,28 @@ export const deleteExercise = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const [planCount, sessionCount] = await Promise.all([
+      Plan.countDocuments({ "weeks.days.exercises.exerciseId": id }),
+      Session.countDocuments({ "exercises.exerciseId": id }),
+    ]);
+
+    if (planCount > 0 || sessionCount > 0) {
+      const parts = [];
+      if (planCount > 0) parts.push(`${planCount} plan${planCount === 1 ? "" : "s"}`);
+      if (sessionCount > 0) parts.push(`${sessionCount} session${sessionCount === 1 ? "" : "s"}`);
+      return res.status(409).json({
+        message: `Can't delete — used in ${parts.join(" and ")}.`,
+      });
+    }
+
     const deleteEx = await Exercise.findByIdAndDelete(id);
     if (!deleteEx) {
-      res.status(404).json({ message: "Error finding exercise" });
+      return res.status(404).json({ message: "Error finding exercise" });
     }
 
     res.status(200).json({ message: "Exercise deleted." });
   } catch (error) {
     console.error("Problem getting results, ", error);
+    res.status(500).json({ message: "Error deleting exercise" });
   }
 };

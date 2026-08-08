@@ -13,6 +13,7 @@ import CreatePlan from "./pages/CreatePlan";
 import Sessions from "./pages/Sessions";
 import Progress from "./pages/Progress";
 import UserProfile from "./pages/UserProfile";
+import Exercises from "./pages/Exercises";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/session" element={<Sessions />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/user" element={<UserProfile />} />
+            <Route path="/exercises" element={<Exercises />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/plans/create" element={<CreatePlan />} />
             <Route path="/plans/:id" element={<PlanDetail />} />

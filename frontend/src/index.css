@@ -35,10 +35,18 @@ body {
   }
 }
 
+/*
+ * No fill-mode here on purpose: `forwards`/`both` keeps the animation's
+ * transform effect "active" on the element indefinitely (per spec), which
+ * makes it a new containing block for any `position: fixed` descendant
+ * (e.g. a modal or full-screen overlay nested inside a page that has this
+ * class). The keyframes' end state (opacity/transform) already matches the
+ * element's normal resting style, so playback looks identical without it.
+ */
 .animate-fade-in-up {
-  animation: fade-in-up 0.35s ease-out both;
+  animation: fade-in-up 0.35s ease-out;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.2s ease-out both;
+  animation: fade-in 0.2s ease-out;
 }

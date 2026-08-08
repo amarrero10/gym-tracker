@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import api from "../api/axios";
+import useExercises from "../hooks/useExercises";
+import ExerciseForm from "../components/ExerciseForm";
 import { ArrowLeft, ArrowRight, Plus, X } from "lucide-react";
 
 const defaultExerciseForm = {
@@ -30,7 +32,7 @@ const CreatePlan = () => {
 
   // Step 2 state
   const [weeks, setWeeks] = useState([]);
-  const [exercises, setExercises] = useState([]);
+  const { exercises, refetch: refetchExercises } = useExercises();
   const [exerciseSearch, setExerciseSearch] = useState("");
 
   // Per-day exercise adder: { weekIdx, dayIdx } or null
@@ -39,23 +41,11 @@ const CreatePlan = () => {
 
   // Inline create-exercise sub-form
   const [creatingExercise, setCreatingExercise] = useState(false);
-  const [newExForm, setNewExForm] = useState({ name: "", muscleGroup: "", movementPattern: "", equipment: "" });
+  const [newExSubmitting, setNewExSubmitting] = useState(false);
   const [newExError, setNewExError] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchExercises = async () => {
-      try {
-        const res = await api.get("/exercises", { headers });
-        setExercises(res.data);
-      } catch (err) {
-        console.error("Error fetching exercises:", err);
-      }
-    };
-    fetchExercises();
-  }, []);
 
   const goToStep2 = () => {
     if (!name.trim()) return;
@@ -90,31 +80,23 @@ const CreatePlan = () => {
     setExerciseForm(defaultExerciseForm);
     setExerciseSearch("");
     setCreatingExercise(false);
-    setNewExForm({ name: "", muscleGroup: "", movementPattern: "", equipment: "" });
     setNewExError(null);
   };
 
-  const submitNewExercise = async () => {
-    const name = newExForm.name.trim().toLowerCase();
-    const duplicate = exercises.find((e) => e.name.toLowerCase() === name);
-    if (duplicate) {
-      setNewExError("An exercise with this name already exists.");
-      return;
-    }
+  const submitNewExercise = async (values) => {
+    setNewExSubmitting(true);
+    setNewExError(null);
     try {
-      await api.post("/exercises", newExForm, { headers });
-      const res = await api.get("/exercises", { headers });
-      setExercises(res.data);
-      const created = res.data.find((e) => e.name === name);
-      if (created) {
-        setExerciseForm((prev) => ({ ...prev, exerciseId: created._id }));
-        setExerciseSearch(created.name);
-      }
+      const res = await api.post("/exercises", values, { headers });
+      const created = res.data.exercise;
+      await refetchExercises();
+      setExerciseForm((prev) => ({ ...prev, exerciseId: created._id }));
+      setExerciseSearch(created.name);
       setCreatingExercise(false);
-      setNewExForm({ name: "", muscleGroup: "", movementPattern: "", equipment: "" });
-      setNewExError(null);
     } catch (err) {
       setNewExError(err.response?.data?.message ?? "Error creating exercise");
+    } finally {
+      setNewExSubmitting(false);
     }
   };
 
@@ -374,46 +356,14 @@ const CreatePlan = () => {
                   ) : (
                     <>
                       <p className="text-white text-sm font-bold">New Exercise</p>
-                      {newExError && <p className="text-red-400 text-xs">{newExError}</p>}
-                      <input
-                        value={newExForm.name}
-                        onChange={(e) => setNewExForm((p) => ({ ...p, name: e.target.value }))}
-                        placeholder="Exercise name"
-                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
+                      <ExerciseForm
+                        key={`${wi}-${di}-new`}
+                        onSubmit={submitNewExercise}
+                        onCancel={() => { setCreatingExercise(false); setNewExError(null); }}
+                        submitLabel="Create & Select"
+                        submitting={newExSubmitting}
+                        error={newExError}
                       />
-                      <input
-                        value={newExForm.muscleGroup}
-                        onChange={(e) => setNewExForm((p) => ({ ...p, muscleGroup: e.target.value }))}
-                        placeholder="Muscle group (e.g. chest)"
-                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
-                      />
-                      <input
-                        value={newExForm.movementPattern}
-                        onChange={(e) => setNewExForm((p) => ({ ...p, movementPattern: e.target.value }))}
-                        placeholder="Movement pattern (e.g. push)"
-                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
-                      />
-                      <input
-                        value={newExForm.equipment}
-                        onChange={(e) => setNewExForm((p) => ({ ...p, equipment: e.target.value }))}
-                        placeholder="Equipment (e.g. barbell)"
-                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
-                      />
-                      <div className="flex gap-2 mt-1">
-                        <button
-                          onClick={() => { setCreatingExercise(false); setNewExError(null); }}
-                          className="flex-1 py-2 rounded text-white text-sm border border-[#2C2C31] cursor-pointer hover:bg-[#1C1C21] transition-colors"
-                        >
-                          Back
-                        </button>
-                        <button
-                          onClick={submitNewExercise}
-                          disabled={!newExForm.name.trim() || !newExForm.muscleGroup.trim() || !newExForm.movementPattern.trim() || !newExForm.equipment.trim()}
-                          className="flex-1 py-2 rounded text-white text-sm bg-[#D3131B] hover:bg-[#b01016] disabled:opacity-40 cursor-pointer transition active:scale-[0.98]"
-                        >
-                          Create &amp; Select
-                        </button>
-                      </div>
                     </>
                   )}
 

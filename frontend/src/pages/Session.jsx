@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import api from "../api/axios";
+import useExercises from "../hooks/useExercises";
 import { Dumbbell, ArrowRight } from "lucide-react";
 
 const Session = () => {
@@ -14,9 +15,8 @@ const Session = () => {
 
   // Substitute state
   const [substituteFor, setSubstituteFor] = useState(null); // sessionExercise._id
-  const [allExercises, setAllExercises] = useState([]);
+  const { exercises: allExercises, loading: loadingExercises, refetch: fetchAllExercises } = useExercises({ lazy: true });
   const [exerciseSearch, setExerciseSearch] = useState("");
-  const [loadingExercises, setLoadingExercises] = useState(false);
 
   const fetchSession = useCallback(async () => {
     try {
@@ -101,13 +101,7 @@ const Session = () => {
     setSubstituteFor(sessionExerciseId);
     setExerciseSearch("");
     if (allExercises.length === 0) {
-      setLoadingExercises(true);
-      try {
-        const res = await api.get("/exercises");
-        setAllExercises(res.data);
-      } finally {
-        setLoadingExercises(false);
-      }
+      await fetchAllExercises();
     }
   };
 
