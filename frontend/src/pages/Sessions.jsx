@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 const Sessions = () => {
   const navigate = useNavigate();
@@ -69,26 +70,26 @@ const Sessions = () => {
   if (loading)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin" />
+        <div className="h-12 w-12 border-4 border-t-4 border-[#D3131B] rounded-full animate-spin" />
       </div>
     );
 
   return (
-    <div className="px-3">
-      <h1 className="text-[#F5F6F7] text-lg pt-10">Workouts</h1>
-      <p className="text-[#9AA0AA]">Your training history</p>
+    <div className="px-4 pt-10 animate-fade-in-up">
+      <h1 className="text-white text-2xl font-extrabold tracking-tight">Workouts</h1>
+      <p className="text-[#9BA1A6] mt-1">Your training history</p>
 
-      <hr className="w-87.5 h-px border-0 my-6 bg-[#2A2A33]" />
+      <div className="h-px bg-[#2C2C31] my-6" />
 
       {groupedByPlan.length === 0 ? (
-        <div className="bg-[#14141A] rounded-2xl p-4">
-          <p className="text-white pb-1">No workouts yet</p>
-          <p className="text-[#9AA0AA] text-sm pb-4">
+        <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4">
+          <p className="text-white font-bold pb-1">No workouts yet</p>
+          <p className="text-[#9BA1A6] text-sm pb-4">
             Start a session from your plan to see your history here.
           </p>
           <button
             onClick={() => navigate("/plans")}
-            className="bg-[#7A1218] text-white w-1/2 px-10 py-4 rounded-2xl cursor-pointer"
+            className="bg-[#D3131B] hover:bg-[#b01016] text-white px-6 py-3 rounded-lg cursor-pointer transition active:scale-[0.98]"
           >
             View Plans
           </button>
@@ -107,35 +108,37 @@ const Sessions = () => {
             <div key={plan.planId} className="mb-4">
               <button
                 onClick={() => togglePlan(plan.planId)}
-                className="w-full flex justify-between items-center bg-[#14141A] rounded-2xl px-4 py-3 mb-3 cursor-pointer"
+                className="w-full flex justify-between items-center bg-[#141417] border border-[#2C2C31] rounded-lg px-4 py-3 mb-3 cursor-pointer hover:bg-[#1C1C21] transition-colors"
               >
-                <p className="text-white text-base font-semibold capitalize">{plan.planName}</p>
-                <span className="text-[#9AA0AA] text-xs">{isCollapsed ? "▼" : "▲"}</span>
+                <p className="text-white font-bold capitalize">{plan.planName}</p>
+                <span className="text-[#9BA1A6]">
+                  {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                </span>
               </button>
 
               {!isCollapsed && (
-                <div>
+                <div className="animate-fade-in-up">
                   {/* In-progress sessions */}
                   {plan.inProgress.map((s) => (
                     <div
                       key={s._id}
-                      className="bg-[#14141A] rounded-2xl p-4 mb-3 border border-[#7A1218]"
+                      className="bg-[#141417] border-t-2 border-t-[#D3131B] border-x border-b border-[#2C2C31] rounded-lg p-4 mb-3 shadow-[0_0_15px_rgba(211,19,27,0.1)]"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-white font-medium">{s.title}</p>
-                        <span className="text-xs text-[#7A1218] font-semibold uppercase tracking-wide">
+                        <p className="text-white font-bold">{s.title}</p>
+                        <span className="font-mono text-[10px] text-[#D3131B] uppercase tracking-wide">
                           In Progress
                         </span>
                       </div>
-                      <p className="text-[#9AA0AA] text-sm mb-1">
+                      <p className="text-[#9BA1A6] text-sm mb-1">
                         Week {s.weekNumber} · Day {s.dayNumber}
                       </p>
-                      <p className="text-[#9AA0AA] text-sm mb-3">
+                      <p className="text-[#9BA1A6] text-sm mb-3">
                         {s.exercises.length} exercise{s.exercises.length !== 1 ? "s" : ""}
                       </p>
                       <button
                         onClick={() => navigate(`/session/${s._id}`)}
-                        className="bg-[#7A1218] text-white px-6 py-2 rounded-xl cursor-pointer text-sm"
+                        className="bg-[#D3131B] hover:bg-[#b01016] text-white px-6 py-2 rounded-lg cursor-pointer text-sm transition-colors"
                       >
                         Resume Workout
                       </button>
@@ -145,26 +148,26 @@ const Sessions = () => {
                   {/* Completed sessions grouped by week */}
                   {Array.from(byWeek.entries()).map(([week, sessions]) => (
                     <div key={week} className="mb-4">
-                      <p className="text-[#9AA0AA] text-xs uppercase tracking-widest mb-2">
+                      <p className="font-mono text-[10px] text-[#9BA1A6] uppercase tracking-widest mb-2">
                         Week {week}
                       </p>
                       {sessions.map((s) => (
-                        <div key={s._id} className="bg-[#14141A] rounded-2xl p-4 mb-3">
+                        <div key={s._id} className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-3">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-white font-medium">{s.title}</p>
-                            <span className="text-xs text-[#9AA0AA]">
+                            <p className="text-white font-bold">{s.title}</p>
+                            <span className="font-mono text-xs text-[#9BA1A6]">
                               {new Date(s.completedAt).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
                               })}
                             </span>
                           </div>
-                          <p className="text-[#9AA0AA] text-sm mb-2">Day {s.dayNumber}</p>
+                          <p className="text-[#9BA1A6] text-sm mb-2">Day {s.dayNumber}</p>
                           <div className="space-y-1">
                             {s.exercises.map((ex) => {
                               const completedSets = ex.sets.filter((set) => set.isCompleted);
                               return (
-                                <p key={ex._id} className="text-[#9AA0AA] text-xs">
+                                <p key={ex._id} className="text-[#9BA1A6] text-xs">
                                   {completedSets.length} set{completedSets.length !== 1 ? "s" : ""}{" "}
                                   logged
                                   {completedSets.length > 0 && (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import api from "../api/axios";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 const PlanDetail = () => {
   const { id } = useParams();
@@ -89,14 +90,14 @@ const PlanDetail = () => {
   if (loading)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin" />
+        <div className="h-12 w-12 border-4 border-t-4 border-[#D3131B] rounded-full animate-spin" />
       </div>
     );
 
   return (
-    <div className="px-4 mt-10">
+    <div className="px-4 pt-10 animate-fade-in-up">
       {/* Header */}
-      <p className="text-white text-lg font-semibold">{plan.name}</p>
+      <p className="text-white text-lg font-extrabold">{plan.name}</p>
       {plan.completedAt && (
         <p className="text-green-400 text-xs mt-1">
           Completed{" "}
@@ -110,13 +111,13 @@ const PlanDetail = () => {
 
       {/* Summary pills */}
       <div className="flex gap-2 mt-3 mb-6 flex-wrap">
-        <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">
+        <span className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] bg-[#1C1C21] rounded px-3 py-1">
           {plan.weeksCount} {plan.weeksCount === 1 ? "week" : "weeks"}
         </span>
-        <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">
+        <span className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] bg-[#1C1C21] rounded px-3 py-1">
           {plan.daysPerWeek} days / week
         </span>
-        <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">
+        <span className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] bg-[#1C1C21] rounded px-3 py-1">
           {plan.weeks.reduce(
             (acc, w) => acc + w.days.reduce((a, d) => a + d.exercises.length, 0),
             0
@@ -127,62 +128,67 @@ const PlanDetail = () => {
 
       {/* Progress bar */}
       {progress && (
-        <div className="mb-6">
-          <div className="w-full bg-[#2A2A33] rounded-full h-2 mb-2">
+        <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-mono text-[11px] text-[#9BA1A6] uppercase">Plan Progress</span>
+            <span className="font-mono text-[11px] text-[#D3131B]">{progress.completedPercent}%</span>
+          </div>
+          <div className="w-full bg-[#1C1C21] rounded-full h-2 mb-2">
             <div
-              className="bg-[#7A1218] h-2 rounded-full transition-all"
+              className="bg-[#D3131B] h-2 rounded-full transition-all"
               style={{ width: `${progress.completedPercent}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-[#9AA0AA]">
+          <div className="flex justify-between text-xs text-[#9BA1A6]">
             <span>{progress.completedCount} of {progress.totalDays} sessions done</span>
-            <span>{progress.completedPercent}%</span>
           </div>
         </div>
       )}
-
-      <hr className="h-px border-0 mb-6 bg-[#2A2A33]" />
 
       {/* Weeks */}
       {plan.weeks.map((week, wi) => (
         <div key={week._id} className="mb-3">
           <button
             onClick={() => toggleWeek(wi)}
-            className="w-full flex justify-between items-center bg-[#14141A] rounded-2xl px-4 py-3"
+            className="w-full flex justify-between items-center bg-[#141417] border border-[#2C2C31] rounded-lg px-4 py-3 cursor-pointer hover:bg-[#1C1C21] transition-colors"
           >
-            <p className="text-white font-medium">Week {week.weekNumber}</p>
-            <span className="text-zinc-400 text-sm">
+            <p className="text-white font-bold">Week {week.weekNumber}</p>
+            <span className="text-[#9BA1A6] text-sm flex items-center gap-1">
               {week.days.length} {week.days.length === 1 ? "day" : "days"}{" "}
-              {openWeeks[wi] ? "▲" : "▼"}
+              {openWeeks[wi] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </span>
           </button>
 
           {openWeeks[wi] && (
-            <div className="mt-2 pl-2 flex flex-col gap-2">
+            <div className="mt-2 flex flex-col gap-2 animate-fade-in-up">
               {week.days.map((day) => {
                 const isDayCompleted = completedMap[week.weekNumber]?.[day.dayNumber];
+                const isInProgress = inProgressMap[week.weekNumber]?.[day.dayNumber];
                 return (
-                  <div key={day._id} className="bg-zinc-900 rounded-2xl px-4 py-3">
+                  <div
+                    key={day._id}
+                    className={`bg-[#0C0C0E] border border-[#2C2C31] rounded-lg px-4 py-3 ${isInProgress ? "border-t-2 border-t-[#D3131B] shadow-[0_0_15px_rgba(211,19,27,0.1)]" : ""}`}
+                  >
                     <div className="flex justify-between items-center mb-3">
-                      <p className="text-white font-medium">{day.title}</p>
+                      <p className="text-white font-bold">{day.title}</p>
                       {isDayCompleted ? (
-                        <span className="text-xs text-green-400 border border-green-400 rounded-full px-2 py-0.5">
+                        <span className="font-mono text-[10px] uppercase text-green-400 border border-green-900/50 bg-green-900/20 rounded px-2 py-0.5">
                           Completed
                         </span>
-                      ) : inProgressMap[week.weekNumber]?.[day.dayNumber] ? (
+                      ) : isInProgress ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-[#7A1218] border border-[#7A1218] rounded-full px-2 py-0.5">
+                          <span className="font-mono text-[10px] uppercase text-[#D3131B] border border-[#D3131B]/50 rounded px-2 py-0.5">
                             In Progress
                           </span>
                           <button
-                            onClick={() => navigate(`/session/${inProgressMap[week.weekNumber][day.dayNumber]}`)}
-                            className="text-xs bg-[#7A1218] text-white rounded-full px-3 py-0.5 cursor-pointer"
+                            onClick={() => navigate(`/session/${isInProgress}`)}
+                            className="font-mono text-[10px] uppercase bg-[#D3131B] hover:bg-[#b01016] text-white rounded px-3 py-1 cursor-pointer transition active:scale-[0.98]"
                           >
                             Begin
                           </button>
                         </div>
                       ) : (
-                        <span className="text-xs text-zinc-500 border border-zinc-700 rounded-full px-2 py-0.5">
+                        <span className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] rounded px-2 py-0.5">
                           Not done
                         </span>
                       )}
@@ -192,10 +198,10 @@ const PlanDetail = () => {
                       return (
                         <div
                           key={ex._id}
-                          className="flex justify-between text-sm py-2 border-t border-zinc-800 first:border-0"
+                          className="flex justify-between text-sm py-2 border-t border-[#1C1C21] first:border-0"
                         >
-                          <span className="text-white">{exercise?.name ?? "—"}</span>
-                          <span className="text-zinc-400">
+                          <span className="text-white capitalize">{exercise?.name ?? "—"}</span>
+                          <span className="font-mono text-xs text-[#9BA1A6]">
                             {ex.targetSets} sets · {ex.targetRepsMin}–{ex.targetRepsMax} reps
                           </span>
                         </div>

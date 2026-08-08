@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import api from "../api/axios";
+import { Dumbbell, ArrowRight } from "lucide-react";
 
 const Session = () => {
   const { id } = useParams();
@@ -134,7 +135,7 @@ const Session = () => {
   if (loading)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin" />
+        <div className="h-12 w-12 border-4 border-t-4 border-[#D3131B] rounded-full animate-spin" />
       </div>
     );
 
@@ -143,13 +144,13 @@ const Session = () => {
   );
 
   return (
-    <div className="px-4 mt-10">
+    <div className="px-4 pt-10 animate-fade-in-up">
       <div>
-        <p className="text-white">Workout</p>
-        <p className="text-[#9AA0AA]">{session.title}</p>
-        <hr className="w-87.5 h-px border-0 my-6 bg-[#2A2A33]" />
+        <h1 className="text-white text-2xl font-extrabold tracking-tight">Active Workout</h1>
+        <p className="text-[#9BA1A6] mt-1">{session.title}</p>
+        <div className="h-px bg-[#2C2C31] my-6" />
       </div>
-      <p className="text-white mb-6">Up next</p>
+      <p className="font-mono text-[10px] tracking-widest text-[#9BA1A6] uppercase mb-4">Up next</p>
 
       {exerciseDetails.map((e, i) => {
         const sessionExercise = session?.exercises[i];
@@ -157,54 +158,59 @@ const Session = () => {
         const isSkipped = sessionExercise?.skipped;
 
         return (
-          <div className="bg-[#14141A] rounded-2xl p-4 mb-4" key={e._id}>
-            <div className="flex justify-between items-center mb-1">
-              <p className="text-white">{e.name}</p>
+          <div
+            className={`bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4 ${!isSkipped && !isCompleted ? "border-t-2 border-t-[#D3131B]" : ""}`}
+            key={e._id}
+          >
+            <div className="flex justify-between items-start mb-1">
+              <p className="text-white font-bold uppercase tracking-tight">{e.name}</p>
               <div className="flex items-center gap-2">
                 {isSkipped ? (
-                  <span className="text-xs text-zinc-400 border border-zinc-600 rounded-full px-2 py-0.5">
+                  <span className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] rounded px-2 py-0.5">
                     Skipped
                   </span>
                 ) : isCompleted ? (
                   <>
-                    <span className="text-xs text-green-400 border border-green-400 rounded-full px-2 py-0.5">
+                    <span className="font-mono text-[10px] uppercase text-green-400 border border-green-900/50 bg-green-900/20 rounded px-2 py-0.5">
                       Completed
                     </span>
                     <button
                       onClick={() =>
                         navigate(`/session/${id}/exercise/${sessionExercise._id}/edit`)
                       }
-                      className="text-xs text-zinc-400 border border-zinc-600 rounded-full px-2 py-0.5 cursor-pointer"
+                      className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] rounded px-2 py-0.5 cursor-pointer hover:text-white transition-colors"
                     >
                       Edit
                     </button>
                   </>
-                ) : null}
+                ) : (
+                  <Dumbbell className="w-5 h-5 text-[#9BA1A6]" />
+                )}
               </div>
             </div>
 
-            <p className="text-[#9AA0AA] text-sm">{sessionExercise?.targetSets} sets</p>
-            <p className="text-[#9AA0AA] text-sm mb-3">
+            <p className="text-[#9BA1A6] text-sm">{sessionExercise?.targetSets} sets</p>
+            <p className="text-[#9BA1A6] text-sm mb-3">
               {sessionExercise?.targetRepsMin} - {sessionExercise?.targetRepsMax} reps
             </p>
 
             {!isSkipped && !isCompleted && (
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => session?._id && goToSet(sessionExercise._id, e._id)}
-                  className="text-[#9AA0AA]"
+                  className="bg-[#D3131B] hover:bg-[#b01016] text-white font-bold py-2 px-4 rounded cursor-pointer transition active:scale-[0.98] flex items-center justify-center gap-2 flex-grow"
                 >
-                  Log →
+                  Log <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleSkipExercise(sessionExercise._id)}
-                  className="text-xs text-zinc-400 border border-zinc-600 rounded-full px-3 py-1 cursor-pointer"
+                  className="font-mono text-[10px] uppercase text-white border border-[#2C2C31] rounded px-3 py-2 cursor-pointer hover:bg-[#1C1C21] transition-colors"
                 >
                   Skip move
                 </button>
                 <button
                   onClick={() => openSubstitute(sessionExercise._id)}
-                  className="text-xs text-zinc-400 border border-zinc-600 rounded-full px-3 py-1 cursor-pointer"
+                  className="font-mono text-[10px] uppercase text-white border border-[#2C2C31] rounded px-3 py-2 cursor-pointer hover:bg-[#1C1C21] transition-colors"
                 >
                   Substitute
                 </button>
@@ -213,10 +219,10 @@ const Session = () => {
 
             {isCompleted && !isSkipped && (
               <div className="flex items-center gap-3 mt-1">
-                <span className="text-[#9AA0AA] text-sm">Done ✓</span>
+                <span className="text-[#9BA1A6] text-sm">Done ✓</span>
                 <button
                   onClick={() => openSubstitute(sessionExercise._id)}
-                  className="text-xs text-zinc-400 border border-zinc-600 rounded-full px-3 py-1 cursor-pointer"
+                  className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] rounded px-3 py-1 cursor-pointer hover:text-white transition-colors"
                 >
                   Substitute
                 </button>
@@ -229,7 +235,7 @@ const Session = () => {
       <button
         onClick={finishSession}
         disabled={!allDone}
-        className="mt-2 w-full py-3 rounded-xl text-white font-semibold bg-[#7A1218] disabled:opacity-40 disabled:cursor-not-allowed"
+        className="mt-2 w-full py-4 rounded-lg text-white font-bold bg-[#D3131B] hover:bg-[#b01016] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition active:scale-[0.98] uppercase tracking-wide"
       >
         Complete Workout
       </button>
@@ -237,7 +243,7 @@ const Session = () => {
       {!allDone && (
         <button
           onClick={finishSession}
-          className="mt-3 w-full py-3 rounded-xl text-zinc-400 text-sm border border-zinc-700 cursor-pointer"
+          className="mt-3 w-full py-4 rounded-lg text-[#D3131B] text-sm border border-[#2C2C31] cursor-pointer hover:bg-[#1C1C21] transition-colors uppercase tracking-wide font-bold"
         >
           Skip Workout
         </button>
@@ -245,13 +251,13 @@ const Session = () => {
 
       {/* Substitute exercise full-screen overlay */}
       {substituteFor && (
-        <div className="fixed inset-0 bg-[#0D0D12] z-50 flex flex-col">
+        <div className="fixed inset-0 bg-[#0C0C0E] z-50 flex flex-col animate-fade-in-up">
           <div className="px-4 pt-10 pb-4">
             <div className="flex justify-between items-center mb-4">
-              <p className="text-white text-lg font-semibold">Select Exercise</p>
+              <p className="text-white text-lg font-bold">Select Exercise</p>
               <button
                 onClick={() => setSubstituteFor(null)}
-                className="text-[#9AA0AA] text-sm cursor-pointer"
+                className="text-[#9BA1A6] hover:text-white text-sm cursor-pointer transition active:scale-[0.98]"
               >
                 Cancel
               </button>
@@ -261,7 +267,7 @@ const Session = () => {
               placeholder="Search exercises..."
               value={exerciseSearch}
               onChange={(e) => setExerciseSearch(e.target.value)}
-              className="w-full bg-[#14141A] text-white rounded-xl px-4 py-3 outline-none text-sm"
+              className="w-full bg-[#1C1C21] border border-[#2C2C31] text-white rounded px-4 py-3 outline-none text-sm focus:border-[#D3131B] transition-all"
               autoFocus
             />
           </div>
@@ -269,20 +275,20 @@ const Session = () => {
           <div className="flex-1 overflow-y-auto px-4 pb-8">
             {loadingExercises ? (
               <div className="flex justify-center pt-10">
-                <div className="h-8 w-8 border-4 border-t-4 border-[#7A1218] rounded-full animate-spin" />
+                <div className="h-8 w-8 border-4 border-t-4 border-[#D3131B] rounded-full animate-spin" />
               </div>
             ) : filteredExercises.length === 0 ? (
-              <p className="text-[#9AA0AA] text-sm text-center pt-10">No exercises found</p>
+              <p className="text-[#9BA1A6] text-sm text-center pt-10">No exercises found</p>
             ) : (
               filteredExercises.map((ex) => (
                 <button
                   key={ex._id}
                   onClick={() => handleSubstitute(ex._id)}
-                  className="w-full text-left bg-[#14141A] rounded-xl px-4 py-3 mb-2 cursor-pointer"
+                  className="w-full text-left bg-[#141417] border border-[#2C2C31] rounded px-4 py-3 mb-2 cursor-pointer hover:bg-[#1C1C21] transition-colors"
                 >
                   <p className="text-white text-sm">{ex.name}</p>
                   {ex.muscleGroup && (
-                    <p className="text-[#9AA0AA] text-xs mt-0.5">{ex.muscleGroup}</p>
+                    <p className="text-[#9BA1A6] text-xs mt-0.5">{ex.muscleGroup}</p>
                   )}
                 </button>
               ))

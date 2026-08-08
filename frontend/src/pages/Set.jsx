@@ -3,7 +3,7 @@ import UseTimer from "../components/UseTimer";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import toast, { Toaster } from "react-hot-toast";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Plus, Check, X } from "lucide-react";
 
 const Set = () => {
   const { sessionId, setId, exerciseId } = useParams();
@@ -108,33 +108,35 @@ const Set = () => {
   if (loading)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className="h-12 w-12 border-4 border-t-4 border-[#7A1218] rounded-full animate-spin" />
+        <div className="h-12 w-12 border-4 border-t-4 border-[#D3131B] rounded-full animate-spin" />
       </div>
     );
 
   return (
-    <div className="bg-[#0D0D12]">
+    <div className="bg-[#0C0C0E] animate-fade-in-up">
       {/* Header */}
       <div className="px-4 pt-12 pb-4">
         <button
           onClick={() => navigate(`/session/${sessionId}`)}
-          className="flex items-center gap-1 text-[#9AA0AA] mb-4 cursor-pointer"
+          className="flex items-center gap-1 text-[#9BA1A6] hover:text-white mb-4 cursor-pointer transition active:scale-[0.98]"
         >
           <ChevronLeft className="w-5 h-5" />
           <span className="text-sm">Back</span>
         </button>
 
-        <h1 className="text-white text-xl font-semibold">{exercise?.name}</h1>
+        <h1 className="text-white text-xl font-extrabold uppercase tracking-tight">
+          {exercise?.name}
+        </h1>
 
-        <div className="flex items-center gap-3 mt-2 flex-wrap">
-          <span className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-full px-3 py-1">
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
+          <span className="bg-[#1C1C21] border border-[#2C2C31] text-[#9BA1A6] font-mono text-xs rounded px-3 py-1">
             {set?.targetSets} {set?.targetSets === 1 ? "set" : "sets"}
           </span>
-          <span className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-full px-3 py-1">
+          <span className="bg-[#1C1C21] border border-[#2C2C31] text-[#9BA1A6] font-mono text-xs rounded px-3 py-1">
             {set?.targetRepsMin}–{set?.targetRepsMax} reps
           </span>
           {set?.restSeconds && (
-            <span className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-full px-3 py-1">
+            <span className="bg-[#1C1C21] border border-[#2C2C31] text-[#9BA1A6] font-mono text-xs rounded px-3 py-1">
               {set.restSeconds}s rest
             </span>
           )}
@@ -145,10 +147,10 @@ const Set = () => {
       <div className="px-4 pb-6">
         {/* Column headers */}
         <div className="grid grid-cols-[2.5rem_1fr_1fr_3.5rem_2.5rem] gap-2 px-2 mb-2">
-          <span className="text-zinc-500 text-xs text-center">Set</span>
-          <span className="text-zinc-500 text-xs text-center">Reps</span>
-          <span className="text-zinc-500 text-xs text-center">Weight</span>
-          <span className="text-zinc-500 text-xs text-center">Done</span>
+          <span className="font-mono text-[10px] text-[#9BA1A6] uppercase text-center">Set</span>
+          <span className="font-mono text-[10px] text-[#9BA1A6] uppercase text-center">Reps</span>
+          <span className="font-mono text-[10px] text-[#9BA1A6] uppercase text-center">Weight</span>
+          <span className="font-mono text-[10px] text-[#9BA1A6] uppercase text-center">Done</span>
           <span></span>
         </div>
 
@@ -158,13 +160,13 @@ const Set = () => {
             return (
               <div
                 key={i}
-                className={`grid grid-cols-[2.5rem_1fr_1fr_3.5rem_2.5rem] gap-2 items-center px-2 py-2 rounded-2xl transition-colors ${
-                  isDone ? "bg-[#7A1218]/20" : "bg-[#14141A]"
+                className={`grid grid-cols-[2.5rem_1fr_1fr_3.5rem_2.5rem] gap-2 items-center px-2 py-2 rounded-lg border transition-colors ${
+                  isDone ? "bg-[#D3131B]/10 border-[#D3131B]/40" : "bg-[#141417] border-[#2C2C31]"
                 }`}
               >
                 {/* Set number */}
                 <span
-                  className={`text-sm font-medium text-center ${isDone ? "text-[#7A1218]" : "text-zinc-400"}`}
+                  className={`font-mono text-sm font-bold text-center ${isDone ? "text-[#D3131B]" : "text-[#9BA1A6]"}`}
                 >
                   {i + 1}
                 </span>
@@ -178,7 +180,7 @@ const Set = () => {
                   onChange={(e) => updateSet(i, "reps", e.target.value)}
                   placeholder="–"
                   min="0"
-                  className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center text-base py-3 w-full outline-none focus:border-[#7A1218]"
+                  className="bg-[#1C1C21] border border-[#2C2C31] rounded text-white text-center text-base py-3 w-full outline-none focus:border-[#D3131B] transition-all"
                 />
 
                 {/* Weight input */}
@@ -191,7 +193,7 @@ const Set = () => {
                   placeholder="–"
                   min="0"
                   step="2.5"
-                  className="bg-zinc-800 border border-zinc-700 rounded-xl text-white text-center text-base py-3 w-full outline-none focus:border-[#7A1218]"
+                  className="bg-[#1C1C21] border border-[#2C2C31] rounded text-white text-center text-base py-3 w-full outline-none focus:border-[#D3131B] transition-all"
                 />
 
                 {/* Done toggle */}
@@ -203,21 +205,21 @@ const Set = () => {
                       return next;
                     })
                   }
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-semibold transition-colors cursor-pointer ${
+                  className={`w-12 h-12 rounded flex items-center justify-center font-semibold transition active:scale-[0.98] cursor-pointer ${
                     isDone
-                      ? "bg-[#7A1218] text-white"
-                      : "border border-zinc-600 text-zinc-500"
+                      ? "bg-[#D3131B] text-white"
+                      : "border border-[#2C2C31] text-[#9BA1A6]"
                   }`}
                 >
-                  {isDone ? "✓" : ""}
+                  {isDone && <Check className="w-5 h-5" />}
                 </button>
 
                 {/* Remove row */}
                 <button
                   onClick={() => removeRow(i)}
-                  className="w-10 h-10 flex items-center justify-center text-zinc-500 text-xl cursor-pointer rounded-xl"
+                  className="w-10 h-10 flex items-center justify-center text-[#9BA1A6] hover:text-white cursor-pointer rounded transition-colors"
                 >
-                  ×
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             );
@@ -227,15 +229,16 @@ const Set = () => {
         {/* Add set button */}
         <button
           onClick={() => setRowCount((n) => n + 1)}
-          className="mt-3 w-full py-4 text-[#9AA0AA] text-sm border border-zinc-700 rounded-2xl cursor-pointer"
+          className="mt-3 w-full py-4 text-[#9BA1A6] text-sm border border-[#2C2C31] rounded-lg cursor-pointer hover:bg-[#1C1C21] transition-colors flex items-center justify-center gap-1.5"
         >
-          + Add Set
+          <Plus className="w-4 h-4" />
+          Add Set
         </button>
 
         <button
           onClick={completeExercise}
           disabled={!isComplete}
-          className="mt-4 w-full py-4 rounded-2xl text-white text-base font-semibold bg-[#7A1218] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          className="mt-4 w-full py-4 rounded-lg text-white text-base font-bold bg-[#D3131B] hover:bg-[#b01016] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition active:scale-[0.98] uppercase tracking-wide"
         >
           Complete Exercise
         </button>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import api from "../api/axios";
+import { ChevronLeft, ChevronRight, Pencil, X } from "lucide-react";
 
 const SessionCalendar = ({ completedDates }) => {
   const today = new Date();
@@ -48,21 +49,21 @@ const SessionCalendar = ({ completedDates }) => {
       <div className="flex items-center justify-between mb-3">
         <button
           onClick={prevMonth}
-          className="text-[#9AA0AA] hover:text-white px-2 py-1 cursor-pointer"
+          className="text-[#9BA1A6] hover:text-white px-2 py-1 cursor-pointer transition active:scale-[0.98]"
         >
-          ‹
+          <ChevronLeft className="w-4 h-4" />
         </button>
-        <p className="text-white text-sm font-medium">{monthLabel}</p>
+        <p className="text-white text-sm font-bold">{monthLabel}</p>
         <button
           onClick={nextMonth}
-          className="text-[#9AA0AA] hover:text-white px-2 py-1 cursor-pointer"
+          className="text-[#9BA1A6] hover:text-white px-2 py-1 cursor-pointer transition active:scale-[0.98]"
         >
-          ›
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1 mb-1">
         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
-          <div key={d} className="text-center text-[#9AA0AA] text-xs">
+          <div key={d} className="text-center font-mono text-[10px] text-[#9BA1A6]">
             {d}
           </div>
         ))}
@@ -72,8 +73,8 @@ const SessionCalendar = ({ completedDates }) => {
           <div
             key={i}
             className={`
-              h-8 flex items-center justify-center rounded-lg text-xs
-              ${d === null ? "" : isCompleted(d) ? "bg-green-600 text-white font-semibold" : isToday(d) ? "bg-[#2A2A33] text-white" : "text-[#9AA0AA]"}
+              h-8 flex items-center justify-center rounded-lg font-mono text-xs
+              ${d === null ? "" : isCompleted(d) ? "bg-[#D3131B] text-white font-bold" : isToday(d) ? "bg-[#2C2C31] text-white" : "text-[#9BA1A6]"}
             `}
           >
             {d ?? ""}
@@ -81,7 +82,7 @@ const SessionCalendar = ({ completedDates }) => {
         ))}
       </div>
       {completedDates.length > 0 && (
-        <p className="text-[#9AA0AA] text-xs mt-3 text-center">
+        <p className="text-[#9BA1A6] text-xs mt-3 text-center">
           {completedDates.length} workout
           {completedDates.length !== 1 ? "s" : ""} completed
         </p>
@@ -134,7 +135,7 @@ const WeightChart = ({ entries }) => {
           width={tipW}
           height={tipH}
           rx="5"
-          fill="#1E1E28"
+          fill="#1C1C21"
         />
         <text
           x={tipX + tipW / 2}
@@ -149,7 +150,7 @@ const WeightChart = ({ entries }) => {
         <text
           x={tipX + tipW / 2}
           y={tipY + 26}
-          fill="#9AA0AA"
+          fill="#9BA1A6"
           fontSize="8"
           textAnchor="middle"
         >
@@ -170,13 +171,13 @@ const WeightChart = ({ entries }) => {
               x2={W - padX}
               y1={y}
               y2={y}
-              stroke="#2A2A33"
+              stroke="#2C2C31"
               strokeWidth="1"
             />
             <text
               x={padX}
               y={y - 3}
-              fill="#9AA0AA"
+              fill="#9BA1A6"
               fontSize="8"
               textAnchor="start"
             >
@@ -188,14 +189,14 @@ const WeightChart = ({ entries }) => {
 
       <polyline
         points={`${toX(0)},${H - padY} ${points} ${toX(entries.length - 1)},${H - padY}`}
-        fill="#7A1218"
+        fill="#D3131B"
         fillOpacity="0.15"
         stroke="none"
       />
       <polyline
         points={points}
         fill="none"
-        stroke="#7A1218"
+        stroke="#D3131B"
         strokeWidth="2"
         strokeLinejoin="round"
       />
@@ -206,7 +207,7 @@ const WeightChart = ({ entries }) => {
           cx={toX(i)}
           cy={toY(e.weight)}
           r={hoveredIndex === i ? 5 : 3}
-          fill="#7A1218"
+          fill="#D3131B"
           style={{ transition: "r 0.1s" }}
         />
       ))}
@@ -237,7 +238,7 @@ const WeightChart = ({ entries }) => {
           key={i}
           x={toX(i)}
           y={H}
-          fill="#9AA0AA"
+          fill="#9BA1A6"
           fontSize="8"
           textAnchor={
             i === 0 ? "start" : i === entries.length - 1 ? "end" : "middle"
@@ -437,31 +438,31 @@ const Progress = () => {
   if (loading)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin" />
+        <div className="h-12 w-12 border-4 border-t-4 border-[#D3131B] rounded-full animate-spin" />
       </div>
     );
 
   return (
-    <div className="px-3">
-      <h1 className="text-[#F5F6F7] text-lg pt-10">Progress</h1>
-      <p className="text-[#9AA0AA]">Your stats at a glance</p>
+    <div className="px-4 pt-10 animate-fade-in-up">
+      <h1 className="text-white text-2xl font-extrabold tracking-tight">Progress</h1>
+      <p className="text-[#9BA1A6] mt-1">Your stats at a glance</p>
 
-      <hr className="w-87.5 h-px border-0 my-6 bg-[#2A2A33]" />
+      <div className="h-px bg-[#2C2C31] my-6" />
 
       {/* Active plan completion */}
       {planProgress ? (
-        <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
-          <p className="text-[#9AA0AA] text-sm mb-1">Current Plan</p>
-          <p className="text-white font-medium capitalize mb-3">
+        <div className="bg-[#141417] border border-[#2C2C31] border-t-2 border-t-[#D3131B] rounded-lg p-4 mb-4">
+          <p className="font-mono text-[10px] text-[#9BA1A6] uppercase mb-1">Current Plan</p>
+          <p className="text-white font-bold capitalize mb-3">
             {activePlanName}
           </p>
-          <div className="w-full bg-[#2A2A33] rounded-full h-2 mb-2">
+          <div className="w-full bg-[#1C1C21] rounded-full h-2 mb-2">
             <div
-              className="bg-[#7A1218] h-2 rounded-full transition-all"
+              className="bg-[#D3131B] h-2 rounded-full transition-all"
               style={{ width: `${planProgress.completedPercent}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-[#9AA0AA] mt-1">
+          <div className="flex justify-between text-xs text-[#9BA1A6] mt-1">
             <span>{planProgress.completedCount} sessions done</span>
             <span>{planProgress.completedPercent}%</span>
           </div>
@@ -470,8 +471,8 @@ const Progress = () => {
           )}
         </div>
       ) : (
-        <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
-          <p className="text-[#9AA0AA] text-sm">No active plan</p>
+        <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4">
+          <p className="text-[#9BA1A6] text-sm">No active plan</p>
           <p className="text-white text-sm mt-1">
             Set a plan as active to track your completion progress.
           </p>
@@ -480,31 +481,31 @@ const Progress = () => {
 
       {/* Overall stats */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-[#14141A] rounded-2xl p-4">
-          <p className="text-[#9AA0AA] text-xs mb-1">Total Workouts</p>
-          <p className="text-white text-2xl font-semibold">{totalWorkouts}</p>
+        <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4">
+          <p className="font-mono text-[10px] text-[#9BA1A6] uppercase mb-1">Total Workouts</p>
+          <p className="text-white text-2xl font-extrabold">{totalWorkouts}</p>
         </div>
-        <div className="bg-[#14141A] rounded-2xl p-4">
-          <p className="text-[#9AA0AA] text-xs mb-1">Total Volume</p>
-          <p className="text-white text-2xl font-semibold">
+        <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4">
+          <p className="font-mono text-[10px] text-[#9BA1A6] uppercase mb-1">Total Volume</p>
+          <p className="text-white text-2xl font-extrabold">
             {formatVolume(totalVolume)}
           </p>
-          <p className="text-[#9AA0AA] text-xs">lbs lifted</p>
+          <p className="text-[#9BA1A6] text-xs">lbs lifted</p>
         </div>
       </div>
 
       {/* Weight Tracking */}
-      <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
+      <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-white font-medium">Body Weight</p>
+          <p className="text-white font-bold">Body Weight</p>
           {weightChange !== null && (
             <span
-              className={`text-xs font-semibold ${
+              className={`font-mono text-xs font-semibold ${
                 parseFloat(weightChange) < 0
                   ? "text-green-400"
                   : parseFloat(weightChange) > 0
                     ? "text-red-400"
-                    : "text-[#9AA0AA]"
+                    : "text-[#9BA1A6]"
               }`}
             >
               {parseFloat(weightChange) > 0 ? "+" : ""}
@@ -529,19 +530,19 @@ const Progress = () => {
             placeholder="lbs"
             value={weightInput}
             onChange={(e) => setWeightInput(e.target.value)}
-            className="bg-[#1E1E28] text-white text-sm rounded-xl px-3 py-2 w-20 outline-none"
+            className="bg-[#1C1C21] border border-[#2C2C31] text-white text-sm rounded px-3 py-2 w-20 outline-none focus:border-[#D3131B] transition-all"
           />
           <input
             type="date"
             value={weightDate}
             max={new Date().toISOString().slice(0, 10)}
             onChange={(e) => setWeightDate(e.target.value)}
-            className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-xl px-3 py-2 flex-1 outline-none"
+            className="bg-[#1C1C21] border border-[#2C2C31] text-[#9BA1A6] text-sm rounded px-3 py-2 flex-1 outline-none focus:border-[#D3131B] transition-all"
           />
           <button
             type="submit"
             disabled={loggingWeight || !weightInput}
-            className="bg-[#7A1218] text-white text-sm px-4 py-2 rounded-xl cursor-pointer disabled:opacity-50"
+            className="bg-[#D3131B] hover:bg-[#b01016] text-white text-sm font-bold px-4 py-2 rounded cursor-pointer transition active:scale-[0.98] disabled:opacity-50"
           >
             Log
           </button>
@@ -549,7 +550,7 @@ const Progress = () => {
 
         {/* Entry list */}
         {weightEntries.length === 0 ? (
-          <p className="text-[#9AA0AA] text-sm">
+          <p className="text-[#9BA1A6] text-sm">
             No entries yet. Log your first weigh-in above.
           </p>
         ) : (
@@ -563,24 +564,24 @@ const Progress = () => {
                     min="0"
                     value={editWeight}
                     onChange={(e) => setEditWeight(e.target.value)}
-                    className="bg-[#1E1E28] text-white text-sm rounded-xl px-3 py-1.5 w-20 outline-none"
+                    className="bg-[#1C1C21] border border-[#2C2C31] text-white text-sm rounded px-3 py-1.5 w-20 outline-none focus:border-[#D3131B] transition-all"
                   />
                   <input
                     type="date"
                     value={editDate}
                     max={new Date().toISOString().slice(0, 10)}
                     onChange={(e) => setEditDate(e.target.value)}
-                    className="bg-[#1E1E28] text-[#9AA0AA] text-sm rounded-xl px-3 py-1.5 flex-1 outline-none"
+                    className="bg-[#1C1C21] border border-[#2C2C31] text-[#9BA1A6] text-sm rounded px-3 py-1.5 flex-1 outline-none focus:border-[#D3131B] transition-all"
                   />
                   <button
                     onClick={() => handleEditSave(entry._id)}
-                    className="text-green-400 text-xs cursor-pointer"
+                    className="text-green-400 text-xs cursor-pointer font-mono uppercase"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditingId(null)}
-                    className="text-[#9AA0AA] text-xs cursor-pointer"
+                    className="text-[#9BA1A6] text-xs cursor-pointer font-mono uppercase"
                   >
                     Cancel
                   </button>
@@ -590,24 +591,24 @@ const Progress = () => {
                   key={entry._id}
                   className="flex items-center justify-between"
                 >
-                  <p className="text-[#9AA0AA] text-sm">
+                  <p className="text-[#9BA1A6] text-sm">
                     {formatDate(entry.date)}
                   </p>
                   <div className="flex items-center gap-3">
-                    <p className="text-white text-sm font-medium">
+                    <p className="text-white text-sm font-bold">
                       {entry.weight} lbs
                     </p>
                     <button
                       onClick={() => handleEditStart(entry)}
-                      className="text-[#9AA0AA] text-xs hover:text-white cursor-pointer"
+                      className="text-[#9BA1A6] hover:text-white cursor-pointer transition active:scale-[0.98]"
                     >
-                      Edit
+                      <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteWeight(entry._id)}
-                      className="text-[#9AA0AA] text-xs hover:text-red-400 cursor-pointer"
+                      className="text-[#9BA1A6] hover:text-red-400 cursor-pointer transition active:scale-[0.98]"
                     >
-                      ✕
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -618,18 +619,21 @@ const Progress = () => {
       </div>
 
       {/* Personal Records */}
-      <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
-        <p className="text-white font-medium mb-3">Personal Records</p>
+      <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4">
+        <p className="text-white font-bold mb-3">Personal Records</p>
         {personalRecords.length === 0 ? (
-          <p className="text-[#9AA0AA] text-sm">
+          <p className="text-[#9BA1A6] text-sm">
             Complete some sets to see your best lifts here.
           </p>
         ) : (
           <div className="space-y-3">
             {personalRecords.map((pr, i) => (
-              <div key={i} className="flex items-center justify-between">
-                <p className="text-[#9AA0AA] text-sm capitalize">{pr.name}</p>
-                <p className="text-white text-sm font-medium">
+              <div
+                key={i}
+                className="flex items-center justify-between border-b border-[#1C1C21] pb-2 last:border-0 last:pb-0"
+              >
+                <p className="text-[#9BA1A6] text-sm capitalize">{pr.name}</p>
+                <p className="font-mono text-sm text-white">
                   {pr.maxWeight} lb × {pr.maxReps}
                 </p>
               </div>
@@ -639,10 +643,10 @@ const Progress = () => {
       </div>
 
       {/* Workout Calendar */}
-      <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
-        <p className="text-white font-medium mb-3">Workout Calendar</p>
+      <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4">
+        <p className="text-white font-bold mb-3">Workout Calendar</p>
         {completedDates.length === 0 ? (
-          <p className="text-[#9AA0AA] text-sm">
+          <p className="text-[#9BA1A6] text-sm">
             Complete a session to see it highlighted here.
           </p>
         ) : (

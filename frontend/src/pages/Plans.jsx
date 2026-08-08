@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import api from "../api/axios";
 import toast, { Toaster } from "react-hot-toast";
+import { Plus } from "lucide-react";
 
 const Plans = () => {
   const [plans, setPlans] = useState([]);
@@ -66,7 +67,7 @@ const Plans = () => {
   if (loading)
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
-        <div className="h-12 w-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin" />
+        <div className="h-12 w-12 border-4 border-t-4 border-[#D3131B] rounded-full animate-spin" />
       </div>
     );
 
@@ -75,38 +76,41 @@ const Plans = () => {
   const completedPlans = plans.filter((p) => p.completedAt);
 
   return (
-    <div className="px-3 pt-10">
+    <div className="px-4 pt-10 animate-fade-in-up">
       <div className="flex justify-between items-center">
-        <h1 className="text-[#F5F6F7] text-lg">Plans</h1>
+        <h1 className="text-white text-2xl font-extrabold tracking-tight">Plans</h1>
         <button
           onClick={() => navigate("/plans/create")}
-          className="bg-[#7A1218] text-white text-sm px-4 py-2 rounded-xl"
+          className="bg-[#D3131B] hover:bg-[#b01016] text-white text-sm font-bold px-4 py-2 rounded-lg cursor-pointer transition active:scale-[0.98] flex items-center gap-1"
         >
-          + Create
+          <Plus className="w-4 h-4" />
+          Create
         </button>
       </div>
 
-      <hr className="h-px border-0 my-6 bg-[#2A2A33]" />
+      <div className="h-px bg-[#2C2C31] my-6" />
 
       {activePlans.length > 0 && (
         <>
-          <p className="text-[#9AA0AA] text-sm mb-3">Active</p>
+          <p className="font-mono text-[10px] tracking-widest text-[#9BA1A6] uppercase mb-3">
+            Active
+          </p>
           {activePlans.map((plan) => (
             <div
               key={plan._id}
               onClick={() => navigate(`/plans/${plan._id}`)}
-              className="bg-[#14141A] rounded-2xl p-4 mb-4 cursor-pointer"
+              className="bg-[#141417] border-t-2 border-t-[#D3131B] border-x border-b border-[#2C2C31] rounded-lg p-4 mb-4 cursor-pointer shadow-[0_0_5px_rgba(211,19,27,0.2)] transition-transform hover:-translate-y-0.5"
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-white font-medium">{plan.name}</p>
-                  <p className="text-[#9AA0AA] text-sm mt-1">
+                  <p className="text-white font-bold">{plan.name}</p>
+                  <p className="text-[#9BA1A6] text-sm mt-1">
                     {plan.weeksCount} {plan.weeksCount === 1 ? "week" : "weeks"} · {plan.daysPerWeek} days/week
                   </p>
                 </div>
                 <button
                   onClick={(e) => deletePlan(e, plan)}
-                  className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1 shrink-0 ml-2"
+                  className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] rounded-full px-3 py-1 shrink-0 ml-2 hover:text-white transition-colors"
                 >
                   Delete
                 </button>
@@ -118,30 +122,32 @@ const Plans = () => {
 
       {inactivePlans.length > 0 && (
         <>
-          <p className="text-[#9AA0AA] text-sm mb-3 mt-2">Not started</p>
+          <p className="font-mono text-[10px] tracking-widest text-[#9BA1A6] uppercase mb-3 mt-2">
+            Not started
+          </p>
           {inactivePlans.map((plan) => (
             <div
               key={plan._id}
               onClick={() => navigate(`/plans/${plan._id}`)}
-              className="bg-[#14141A] rounded-2xl p-4 mb-4 cursor-pointer"
+              className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4 cursor-pointer hover:border-[#47464b] transition hover:-translate-y-0.5"
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-white font-medium">{plan.name}</p>
-                  <p className="text-[#9AA0AA] text-sm mt-1">
+                  <p className="text-white font-bold">{plan.name}</p>
+                  <p className="text-[#9BA1A6] text-sm mt-1">
                     {plan.weeksCount} {plan.weeksCount === 1 ? "week" : "weeks"} · {plan.daysPerWeek} days/week
                   </p>
                 </div>
                 <div className="flex gap-2 shrink-0 ml-2">
                   <button
                     onClick={(e) => activatePlan(e, plan._id)}
-                    className="text-xs text-white bg-[#7A1218] rounded-full px-3 py-1"
+                    className="font-mono text-[10px] uppercase text-white bg-[#D3131B] hover:bg-[#b01016] rounded-full px-3 py-1 transition-colors"
                   >
                     Set Active
                   </button>
                   <button
                     onClick={(e) => deletePlan(e, plan)}
-                    className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1"
+                    className="font-mono text-[10px] uppercase text-[#9BA1A6] border border-[#2C2C31] rounded-full px-3 py-1 hover:text-white transition-colors"
                   >
                     Delete
                   </button>
@@ -154,23 +160,25 @@ const Plans = () => {
 
       {completedPlans.length > 0 && (
         <>
-          <p className="text-[#9AA0AA] text-sm mb-3 mt-2">Completed</p>
+          <p className="font-mono text-[10px] tracking-widest text-[#9BA1A6] uppercase mb-3 mt-2">
+            Completed
+          </p>
           {completedPlans.map((plan) => (
             <div
               key={plan._id}
               onClick={() => navigate(`/plans/${plan._id}`)}
-              className="bg-[#14141A] rounded-2xl p-4 mb-4 cursor-pointer"
+              className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4 cursor-pointer hover:border-[#47464b] transition hover:-translate-y-0.5"
             >
               <div className="flex justify-between items-start">
-                <p className="text-white font-medium">{plan.name}</p>
-                <span className="text-xs text-green-400 border border-green-400 rounded-full px-2 py-0.5">
+                <p className="text-white font-bold">{plan.name}</p>
+                <span className="font-mono text-[10px] uppercase text-green-400 border border-green-400/40 bg-green-900/20 rounded px-2 py-0.5">
                   Done
                 </span>
               </div>
-              <p className="text-[#9AA0AA] text-sm mt-1">
+              <p className="text-[#9BA1A6] text-sm mt-1">
                 {plan.weeksCount} {plan.weeksCount === 1 ? "week" : "weeks"} · {plan.daysPerWeek} days/week
               </p>
-              <p className="text-zinc-500 text-xs mt-1">
+              <p className="font-mono text-[10px] text-[#9BA1A6] mt-1">
                 Completed{" "}
                 {new Date(plan.completedAt).toLocaleDateString("en-US", {
                   month: "short",
@@ -184,7 +192,7 @@ const Plans = () => {
       )}
 
       {plans.length === 0 && (
-        <p className="text-[#9AA0AA] text-center mt-10">No plans yet.</p>
+        <p className="text-[#9BA1A6] text-center mt-10">No plans yet.</p>
       )}
       <Toaster />
     </div>

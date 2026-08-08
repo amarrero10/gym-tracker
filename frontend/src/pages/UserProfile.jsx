@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 const UserProfile = () => {
   const { user, logout, updateUser } = useAuth();
@@ -86,34 +87,34 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="px-3">
-      <h1 className="text-[#F5F6F7] text-lg pt-10">Profile</h1>
-      <p className="text-[#9AA0AA]">Manage your account</p>
+    <div className="px-4 pt-10 animate-fade-in-up">
+      <h1 className="text-white text-2xl font-extrabold tracking-tight">Profile</h1>
+      <p className="text-[#9BA1A6] mt-1">Manage your account</p>
 
-      <hr className="h-px border-0 my-6 bg-[#2A2A33]" />
+      <div className="h-px bg-[#2C2C31] my-6" />
 
       {/* Avatar + name */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="h-14 w-14 rounded-full bg-[#7A1218] flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-semibold text-lg">{initials}</span>
+        <div className="h-16 w-16 rounded-full bg-[#D3131B] flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(211,19,27,0.2)]">
+          <span className="text-white font-extrabold text-lg">{initials}</span>
         </div>
         <div>
-          <p className="text-white font-medium">{user?.displayName || user?.username}</p>
-          <p className="text-[#9AA0AA] text-sm">@{user?.username}</p>
+          <p className="text-white font-bold">{user?.displayName || user?.username}</p>
+          <p className="text-[#9BA1A6] text-sm">@{user?.username}</p>
           {memberSince && (
-            <p className="text-[#9AA0AA] text-xs mt-0.5">Member since {memberSince}</p>
+            <p className="text-[#9BA1A6] text-xs mt-0.5">Member since {memberSince}</p>
           )}
         </div>
       </div>
 
       {/* Display name */}
-      <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
+      <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4 hover:border-[#D3131B] transition-colors">
         <div className="flex items-center justify-between mb-1">
-          <p className="text-[#9AA0AA] text-xs">Display Name</p>
+          <p className="font-mono text-[10px] text-[#9BA1A6] uppercase">Display Name</p>
           {!editingName && (
             <button
               onClick={() => { setEditingName(true); setDisplayNameInput(user?.displayName ?? ""); setNameError(""); }}
-              className="text-xs text-[#9AA0AA] hover:text-white cursor-pointer"
+              className="font-mono text-[10px] uppercase text-[#9BA1A6] hover:text-[#D3131B] cursor-pointer transition active:scale-[0.98]"
             >
               Edit
             </button>
@@ -121,26 +122,26 @@ const UserProfile = () => {
         </div>
 
         {editingName ? (
-          <div className="mt-2">
+          <div className="mt-2 animate-fade-in-up">
             <input
               type="text"
               value={displayNameInput}
               onChange={(e) => setDisplayNameInput(e.target.value)}
               maxLength={50}
-              className="bg-[#1E1E28] text-white text-sm rounded-xl px-3 py-2 w-full outline-none mb-2"
+              className="bg-[#1C1C21] border border-[#2C2C31] text-white text-sm rounded px-3 py-2 w-full outline-none focus:border-[#D3131B] transition-all mb-2"
             />
             {nameError && <p className="text-red-400 text-xs mb-2">{nameError}</p>}
             <div className="flex gap-2">
               <button
                 onClick={handleSaveName}
                 disabled={nameSaving}
-                className="bg-[#7A1218] text-white text-sm px-4 py-2 rounded-xl cursor-pointer disabled:opacity-50"
+                className="bg-[#D3131B] hover:bg-[#b01016] text-white text-sm font-bold px-4 py-2 rounded cursor-pointer transition active:scale-[0.98] disabled:opacity-50"
               >
                 Save
               </button>
               <button
                 onClick={() => setEditingName(false)}
-                className="text-[#9AA0AA] text-sm px-4 py-2 cursor-pointer"
+                className="text-[#9BA1A6] text-sm px-4 py-2 cursor-pointer"
               >
                 Cancel
               </button>
@@ -152,19 +153,21 @@ const UserProfile = () => {
       </div>
 
       {/* Username (read-only) */}
-      <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
-        <p className="text-[#9AA0AA] text-xs mb-1">Username</p>
+      <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4">
+        <p className="font-mono text-[10px] text-[#9BA1A6] uppercase mb-1">Username</p>
         <p className="text-white text-sm">@{user?.username}</p>
       </div>
 
       {/* Change password */}
-      <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
+      <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 mb-4 hover:border-[#D3131B] transition-colors">
         <button
           onClick={() => { setShowPasswordForm((v) => !v); setPasswordError(""); setPasswordSuccess(""); }}
           className="w-full flex justify-between items-center cursor-pointer"
         >
           <p className="text-white text-sm">Change Password</p>
-          <span className="text-[#9AA0AA] text-xs">{showPasswordForm ? "▲" : "▼"}</span>
+          <span className="text-[#9BA1A6]">
+            {showPasswordForm ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </span>
         </button>
 
         {passwordSuccess && !showPasswordForm && (
@@ -172,34 +175,34 @@ const UserProfile = () => {
         )}
 
         {showPasswordForm && (
-          <form onSubmit={handleChangePassword} className="mt-4 space-y-2">
+          <form onSubmit={handleChangePassword} className="mt-4 space-y-2 animate-fade-in-up">
             <input
               type="password"
               placeholder="Current password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="bg-[#1E1E28] text-white text-sm rounded-xl px-3 py-2 w-full outline-none"
+              className="bg-[#1C1C21] border border-[#2C2C31] text-white text-sm rounded px-3 py-2 w-full outline-none focus:border-[#D3131B] transition-all"
             />
             <input
               type="password"
               placeholder="New password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="bg-[#1E1E28] text-white text-sm rounded-xl px-3 py-2 w-full outline-none"
+              className="bg-[#1C1C21] border border-[#2C2C31] text-white text-sm rounded px-3 py-2 w-full outline-none focus:border-[#D3131B] transition-all"
             />
             <input
               type="password"
               placeholder="Confirm new password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="bg-[#1E1E28] text-white text-sm rounded-xl px-3 py-2 w-full outline-none"
+              className="bg-[#1C1C21] border border-[#2C2C31] text-white text-sm rounded px-3 py-2 w-full outline-none focus:border-[#D3131B] transition-all"
             />
             {passwordError && <p className="text-red-400 text-xs">{passwordError}</p>}
             {passwordSuccess && <p className="text-green-400 text-xs">{passwordSuccess}</p>}
             <button
               type="submit"
               disabled={passwordSaving}
-              className="bg-[#7A1218] text-white text-sm px-4 py-2 rounded-xl cursor-pointer disabled:opacity-50 w-full mt-2"
+              className="bg-[#D3131B] hover:bg-[#b01016] text-white text-sm font-bold px-4 py-2 rounded cursor-pointer transition active:scale-[0.98] disabled:opacity-50 w-full mt-2"
             >
               {passwordSaving ? "Saving…" : "Update Password"}
             </button>
@@ -210,7 +213,7 @@ const UserProfile = () => {
       {/* Logout */}
       <button
         onClick={handleLogout}
-        className="w-full text-red-400 border border-red-400 rounded-2xl py-3 text-sm cursor-pointer mb-6"
+        className="w-full text-[#D3131B] border border-[#D3131B]/60 hover:bg-[#D3131B] hover:text-white rounded-lg py-3 text-sm font-bold cursor-pointer transition-all mb-6"
       >
         Log Out
       </button>

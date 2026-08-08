@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import api from "../api/axios";
+import { ArrowLeft, ArrowRight, Plus, X } from "lucide-react";
 
 const defaultExerciseForm = {
   exerciseId: "",
@@ -10,6 +11,10 @@ const defaultExerciseForm = {
   restSeconds: "",
   notes: "",
 };
+
+const inputClass =
+  "w-full bg-[#1C1C21] border border-[#2C2C31] rounded text-white placeholder:text-[#9BA1A6] outline-none focus:border-[#D3131B] focus:shadow-[0_0_10px_rgba(211,19,27,0.2)] transition-all";
+const labelClass = "font-mono text-[10px] tracking-wide text-[#9BA1A6] uppercase";
 
 const CreatePlan = () => {
   const navigate = useNavigate();
@@ -197,78 +202,87 @@ const CreatePlan = () => {
 
   if (step === 1) {
     return (
-      <div className="px-4 pt-10">
-        <button onClick={() => navigate("/plans")} className="text-zinc-400 text-sm mb-6">
-          ← Back
+      <div className="px-4 pt-10 animate-fade-in-up">
+        <button
+          onClick={() => navigate("/plans")}
+          className="flex items-center gap-1 text-[#9BA1A6] hover:text-white text-sm mb-6 cursor-pointer transition active:scale-[0.98]"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
         </button>
-        <h1 className="text-white text-lg font-semibold mb-1">New Plan</h1>
-        <p className="text-zinc-400 text-sm mb-6">Set up the basics first.</p>
+        <h1 className="text-white text-2xl font-extrabold tracking-tight mb-1">New Plan</h1>
+        <p className="text-[#9BA1A6] text-sm mb-6">Set up the basics first.</p>
 
-        <div className="flex flex-col gap-4">
-          <div>
-            <label className="text-zinc-400 text-sm">Plan name</label>
+        <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label className={labelClass}>Plan name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. 5 Day Push Pull"
-              className="w-full mt-1 bg-[#14141A] text-white rounded-xl px-4 py-3 border border-zinc-700 outline-none"
+              className={`${inputClass} px-4 py-3`}
             />
           </div>
 
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-zinc-400 text-sm">Weeks</label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <label className={labelClass}>Weeks</label>
               <input
                 type="number"
                 min={1}
                 value={weeksCount}
                 onChange={(e) => setWeeksCount(e.target.value)}
-                className="w-full mt-1 bg-[#14141A] text-white rounded-xl px-4 py-3 border border-zinc-700 outline-none"
+                className={`${inputClass} px-4 py-3`}
               />
             </div>
-            <div className="flex-1">
-              <label className="text-zinc-400 text-sm">Days / week</label>
+            <div className="flex flex-col gap-2">
+              <label className={labelClass}>Days / week</label>
               <input
                 type="number"
                 min={1}
                 value={daysPerWeek}
                 onChange={(e) => setDaysPerWeek(e.target.value)}
-                className="w-full mt-1 bg-[#14141A] text-white rounded-xl px-4 py-3 border border-zinc-700 outline-none"
+                className={`${inputClass} px-4 py-3`}
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between bg-[#14141A] rounded-xl px-4 py-3 border border-zinc-700">
+          <div className="flex items-center justify-between bg-[#1C1C21] border border-[#2C2C31] rounded px-4 py-3">
             <span className="text-white text-sm">Set as active plan</span>
             <button
               onClick={() => setIsActive((v) => !v)}
-              className={`w-12 h-6 rounded-full transition-colors ${isActive ? "bg-[#7A1218]" : "bg-zinc-700"}`}
+              className={`w-11 h-6 rounded-full transition active:scale-[0.98] cursor-pointer ${isActive ? "bg-[#D3131B]" : "bg-[#2F363A]"}`}
             >
               <span
-                className={`block w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${isActive ? "translate-x-6" : ""}`}
+                className={`block w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${isActive ? "translate-x-5" : ""}`}
               />
             </button>
           </div>
-
-          <button
-            onClick={goToStep2}
-            disabled={!name.trim()}
-            className="w-full py-3 rounded-xl text-white font-semibold bg-[#7A1218] disabled:opacity-40 mt-2"
-          >
-            Next →
-          </button>
         </div>
+
+        <button
+          onClick={goToStep2}
+          disabled={!name.trim()}
+          className="w-full py-3 rounded-lg text-white font-bold bg-[#D3131B] hover:bg-[#b01016] disabled:opacity-40 mt-4 cursor-pointer transition active:scale-[0.98] flex items-center justify-center gap-2"
+        >
+          Next
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="px-4 pt-10">
-      <button onClick={() => setStep(1)} className="text-zinc-400 text-sm mb-6">
-        ← Back
+    <div className="px-4 pt-10 pb-6 animate-fade-in-up">
+      <button
+        onClick={() => setStep(1)}
+        className="flex items-center gap-1 text-[#9BA1A6] hover:text-white text-sm mb-6 cursor-pointer transition active:scale-[0.98]"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
       </button>
-      <h1 className="text-white text-lg font-semibold mb-1">{name}</h1>
-      <p className="text-zinc-400 text-sm mb-6">
+      <h1 className="text-white text-lg font-bold mb-1">{name}</h1>
+      <p className="font-mono text-[10px] tracking-wide text-[#9BA1A6] uppercase mb-6">
         {weeksCount} {weeksCount === 1 ? "week" : "weeks"} · {daysPerWeek} days/week
       </p>
 
@@ -276,34 +290,44 @@ const CreatePlan = () => {
 
       {weeks.map((week, wi) => (
         <div key={wi} className="mb-6">
-          <p className="text-zinc-400 text-xs uppercase tracking-wide mb-3">Week {week.weekNumber}</p>
+          <p className="font-mono text-[10px] tracking-widest text-[#9BA1A6] uppercase mb-3 border-b border-[#1C1C21] pb-2">
+            Week {week.weekNumber}
+          </p>
 
           {week.days.map((day, di) => (
-            <div key={di} className="bg-[#14141A] rounded-2xl p-4 mb-3">
-              <p className="text-zinc-400 text-xs mb-2">Day {day.dayNumber}</p>
+            <div
+              key={di}
+              className="bg-[#141417] border border-[#2C2C31] border-t-2 border-t-[#D3131B] rounded-lg p-4 mb-3"
+            >
+              <p className="font-mono text-[10px] tracking-wide text-white uppercase mb-2">
+                Day {day.dayNumber}
+              </p>
               <input
                 value={day.title}
                 onChange={(e) => updateDayTitle(wi, di, e.target.value)}
                 placeholder="e.g. Upper Body"
-                className="w-full bg-zinc-900 text-white rounded-xl px-4 py-2 border border-zinc-700 outline-none text-sm mb-3"
+                className={`${inputClass} px-4 py-2 text-sm mb-3`}
               />
 
               {day.exercises.length > 0 && (
                 <div className="flex flex-col gap-2 mb-3">
                   {day.exercises.map((ex, ei) => (
-                    <div key={ei} className="flex justify-between items-center bg-zinc-900 rounded-xl px-3 py-2">
+                    <div
+                      key={ei}
+                      className="flex justify-between items-center bg-[#1C1C21] border border-[#2C2C31] rounded px-3 py-2"
+                    >
                       <div>
                         <p className="text-white text-sm">{getExerciseName(ex.exerciseId)}</p>
-                        <p className="text-zinc-400 text-xs">
+                        <p className="text-[#9BA1A6] text-xs">
                           {ex.targetSets} sets · {ex.targetRepsMin}–{ex.targetRepsMax} reps
                           {ex.restSeconds ? ` · ${ex.restSeconds}s rest` : ""}
                         </p>
                       </div>
                       <button
                         onClick={() => removeExercise(wi, di, ei)}
-                        className="text-zinc-500 text-sm px-2"
+                        className="text-[#9BA1A6] hover:text-white text-sm px-2 cursor-pointer"
                       >
-                        ✕
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
@@ -311,14 +335,14 @@ const CreatePlan = () => {
               )}
 
               {addingTo?.wi === wi && addingTo?.di === di ? (
-                <div className="bg-zinc-900 rounded-xl p-3 flex flex-col gap-2">
+                <div className="bg-[#0C0C0E] border border-[#1C1C21] rounded p-3 flex flex-col gap-2 animate-fade-in-up">
                   {!creatingExercise ? (
                     <>
                       <input
                         value={exerciseSearch}
                         onChange={(e) => setExerciseSearch(e.target.value)}
                         placeholder="Search exercise..."
-                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
                       />
                       {exerciseSearch && (
                         <div className="max-h-36 overflow-y-auto flex flex-col gap-1">
@@ -329,62 +353,63 @@ const CreatePlan = () => {
                                 setExerciseForm((prev) => ({ ...prev, exerciseId: e._id }));
                                 setExerciseSearch(e.name);
                               }}
-                              className={`text-left px-3 py-2 rounded-lg text-sm ${exerciseForm.exerciseId === e._id ? "bg-[#7A1218] text-white" : "text-zinc-300 bg-zinc-800"}`}
+                              className={`text-left px-3 py-2 rounded text-sm cursor-pointer transition active:scale-[0.98] ${exerciseForm.exerciseId === e._id ? "bg-[#D3131B] text-white" : "text-[#9BA1A6] bg-[#1C1C21] hover:bg-[#2F363A]"}`}
                             >
                               {e.name}
                             </button>
                           ))}
                           {filteredExercises.length === 0 && (
-                            <p className="text-zinc-500 text-xs px-2 py-1">No matches found.</p>
+                            <p className="text-[#9BA1A6] text-xs px-2 py-1">No matches found.</p>
                           )}
                         </div>
                       )}
                       <button
                         onClick={() => { setCreatingExercise(true); setNewExError(null); }}
-                        className="text-xs text-[#7A1218] border border-[#7A1218] rounded-xl px-3 py-2 text-left"
+                        className="text-xs text-[#D3131B] border border-dashed border-[#5d3f3c] rounded px-3 py-2 text-left cursor-pointer hover:bg-[#1a2024] transition-colors flex items-center gap-1.5"
                       >
-                        + Create new exercise
+                        <Plus className="w-3.5 h-3.5" />
+                        Create new exercise
                       </button>
                     </>
                   ) : (
                     <>
-                      <p className="text-white text-sm font-medium">New Exercise</p>
+                      <p className="text-white text-sm font-bold">New Exercise</p>
                       {newExError && <p className="text-red-400 text-xs">{newExError}</p>}
                       <input
                         value={newExForm.name}
                         onChange={(e) => setNewExForm((p) => ({ ...p, name: e.target.value }))}
                         placeholder="Exercise name"
-                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
                       />
                       <input
                         value={newExForm.muscleGroup}
                         onChange={(e) => setNewExForm((p) => ({ ...p, muscleGroup: e.target.value }))}
                         placeholder="Muscle group (e.g. chest)"
-                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
                       />
                       <input
                         value={newExForm.movementPattern}
                         onChange={(e) => setNewExForm((p) => ({ ...p, movementPattern: e.target.value }))}
                         placeholder="Movement pattern (e.g. push)"
-                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
                       />
                       <input
                         value={newExForm.equipment}
                         onChange={(e) => setNewExForm((p) => ({ ...p, equipment: e.target.value }))}
                         placeholder="Equipment (e.g. barbell)"
-                        className="w-full bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
                       />
                       <div className="flex gap-2 mt-1">
                         <button
                           onClick={() => { setCreatingExercise(false); setNewExError(null); }}
-                          className="flex-1 py-2 rounded-xl text-white text-sm border border-zinc-700"
+                          className="flex-1 py-2 rounded text-white text-sm border border-[#2C2C31] cursor-pointer hover:bg-[#1C1C21] transition-colors"
                         >
                           Back
                         </button>
                         <button
                           onClick={submitNewExercise}
                           disabled={!newExForm.name.trim() || !newExForm.muscleGroup.trim() || !newExForm.movementPattern.trim() || !newExForm.equipment.trim()}
-                          className="flex-1 py-2 rounded-xl text-white text-sm bg-[#7A1218] disabled:opacity-40"
+                          className="flex-1 py-2 rounded text-white text-sm bg-[#D3131B] hover:bg-[#b01016] disabled:opacity-40 cursor-pointer transition active:scale-[0.98]"
                         >
                           Create &amp; Select
                         </button>
@@ -394,54 +419,54 @@ const CreatePlan = () => {
 
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <label className="text-zinc-400 text-xs">Sets</label>
+                      <label className={`${labelClass} block mb-1`}>Sets</label>
                       <input
                         type="number"
                         min={1}
                         value={exerciseForm.targetSets}
                         onChange={(e) => setExerciseForm((p) => ({ ...p, targetSets: e.target.value }))}
-                        className="w-full mt-0.5 bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm text-center`}
                       />
                     </div>
                     <div className="flex-1">
-                      <label className="text-zinc-400 text-xs">Reps min</label>
+                      <label className={`${labelClass} block mb-1`}>Reps min</label>
                       <input
                         type="number"
                         min={1}
                         value={exerciseForm.targetRepsMin}
                         onChange={(e) => setExerciseForm((p) => ({ ...p, targetRepsMin: e.target.value }))}
-                        className="w-full mt-0.5 bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm text-center`}
                       />
                     </div>
                     <div className="flex-1">
-                      <label className="text-zinc-400 text-xs">Reps max</label>
+                      <label className={`${labelClass} block mb-1`}>Reps max</label>
                       <input
                         type="number"
                         min={1}
                         value={exerciseForm.targetRepsMax}
                         onChange={(e) => setExerciseForm((p) => ({ ...p, targetRepsMax: e.target.value }))}
-                        className="w-full mt-0.5 bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm text-center`}
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <label className="text-zinc-400 text-xs">Rest (seconds)</label>
+                      <label className={`${labelClass} block mb-1`}>Rest (seconds)</label>
                       <input
                         type="number"
                         min={0}
                         value={exerciseForm.restSeconds}
                         onChange={(e) => setExerciseForm((p) => ({ ...p, restSeconds: e.target.value }))}
-                        className="w-full mt-0.5 bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
                       />
                     </div>
                     <div className="flex-1">
-                      <label className="text-zinc-400 text-xs">Notes (optional)</label>
+                      <label className={`${labelClass} block mb-1`}>Notes (optional)</label>
                       <input
                         value={exerciseForm.notes}
                         onChange={(e) => setExerciseForm((p) => ({ ...p, notes: e.target.value }))}
-                        className="w-full mt-0.5 bg-zinc-800 text-white rounded-xl px-3 py-2 border border-zinc-700 outline-none text-sm"
+                        className={`${inputClass} bg-[#1C1C21] px-3 py-2 text-sm`}
                       />
                     </div>
                   </div>
@@ -449,14 +474,14 @@ const CreatePlan = () => {
                   <div className="flex gap-2 mt-1">
                     <button
                       onClick={closeAddExercise}
-                      className="flex-1 py-2 rounded-xl text-white text-sm border border-zinc-700"
+                      className="flex-1 py-2 rounded text-white text-sm border border-[#2C2C31] cursor-pointer hover:bg-[#1C1C21] transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => confirmAddExercise(wi, di)}
                       disabled={!exerciseForm.exerciseId || !exerciseForm.targetSets || !exerciseForm.targetRepsMin || !exerciseForm.targetRepsMax}
-                      className="flex-1 py-2 rounded-xl text-white text-sm bg-[#7A1218] disabled:opacity-40"
+                      className="flex-1 py-2 rounded text-white text-sm bg-[#D3131B] hover:bg-[#b01016] disabled:opacity-40 cursor-pointer transition active:scale-[0.98]"
                     >
                       Add
                     </button>
@@ -465,9 +490,10 @@ const CreatePlan = () => {
               ) : (
                 <button
                   onClick={() => openAddExercise(wi, di)}
-                  className="text-sm text-zinc-400 border border-zinc-700 rounded-xl px-4 py-2 w-full"
+                  className="text-sm text-[#9BA1A6] border border-[#2C2C31] rounded px-4 py-2 w-full cursor-pointer hover:bg-[#1C1C21] transition-colors flex items-center justify-center gap-1.5"
                 >
-                  + Add Exercise
+                  <Plus className="w-4 h-4" />
+                  Add Exercise
                 </button>
               )}
             </div>
@@ -475,9 +501,10 @@ const CreatePlan = () => {
         {wi === 0 && Number(weeksCount) > 1 && (
           <button
             onClick={copyWeek1ToAll}
-            className="w-full py-2 mb-2 rounded-xl text-sm text-white border border-zinc-700 hover:border-zinc-500"
+            className="w-full py-2 mb-2 rounded text-sm text-white border border-[#2C2C31] hover:border-[#47464b] cursor-pointer transition active:scale-[0.98] flex items-center justify-center gap-1.5"
           >
-            Copy Week 1 to all weeks →
+            Copy Week 1 to all weeks
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}
         </div>
@@ -486,7 +513,7 @@ const CreatePlan = () => {
       <button
         onClick={submit}
         disabled={submitting}
-        className="w-full py-3 rounded-xl text-white font-semibold bg-[#7A1218] disabled:opacity-40 mb-4"
+        className="w-full py-3 rounded-lg text-white font-bold bg-[#D3131B] hover:bg-[#b01016] disabled:opacity-40 mb-4 cursor-pointer transition active:scale-[0.98]"
       >
         {submitting ? "Creating..." : "Create Plan"}
       </button>

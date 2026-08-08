@@ -41,33 +41,35 @@ export default function Register() {
   };
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
-      <div className="flex flex-col w-screen h-screen items-center">
-        <img className="h-27.5 mt-10" src={logo} alt="Atlas logo" />
-        <p className="text-[12px] text-[#9AA0AA]">Track lifts. Hit PRs. Stay consistent.</p>
-        <hr className="w-87.5 h-px border-0 my-4 bg-[#2A2A33]" />
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#0C0C0E] px-4 py-10">
+      <div className="w-full max-w-md animate-fade-in-up">
+        <div className="flex flex-col items-center text-center mb-8">
+          <img className="h-28 w-auto object-contain" src={logo} alt="Atlas logo" />
+          <h1 className="text-white text-2xl font-extrabold tracking-tight mt-2">
+            Create an account
+          </h1>
+          <p className="text-[#9BA1A6] text-sm mt-2 max-w-[280px]">
+            Start tracking your workouts today.
+          </p>
+        </div>
 
         {errMsg && (
-          <div className="w-full px-4 mb-3">
-            <div className="rounded-xl border border-red-400 bg-red-400/10 px-3 py-2 text-red-400 text-sm">
-              {errMsg}
-            </div>
+          <div className="mb-4 rounded-lg border border-red-400/40 bg-red-400/10 px-3 py-2 text-red-400 text-sm">
+            {errMsg}
           </div>
         )}
 
-        <div className="w-screen px-4">
-          <form className="flex flex-col gap-5 pt-2 pb-6" onSubmit={handleSubmit}>
-            <div className="bg-[#14141A] rounded-2xl p-4">
-              <p className="text-[#F5F6F7] text-[12px] pb-2">Create an account</p>
-              <p className="text-[#9AA0AA] text-[12px] pb-4">
-                Start tracking your workouts today.
-              </p>
-
-              <div className="relative flex items-center pb-4">
-                <ShieldUser className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+        <div className="bg-[#141417] border border-[#2C2C31] rounded-lg p-6">
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            <div className="space-y-1.5">
+              <label className="block font-mono text-[11px] tracking-wide text-[#9BA1A6] uppercase">
+                Username
+              </label>
+              <div className="relative flex items-center">
+                <ShieldUser className="pointer-events-none absolute left-3 h-5 w-5 text-[#9BA1A6]" />
                 <input
-                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
-                  placeholder="username"
+                  className="w-full rounded border border-[#2C2C31] bg-[#1C1C21] py-2.5 pl-10 pr-3 text-white placeholder:text-[#9BA1A6] outline-none focus:border-[#D3131B] focus:shadow-[0_0_10px_rgba(211,19,27,0.2)] transition-all"
+                  placeholder="Choose a username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -75,24 +77,34 @@ export default function Register() {
                   autoComplete="username"
                 />
               </div>
+            </div>
 
-              <div className="relative flex items-center pb-4">
-                <UserRound className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+            <div className="space-y-1.5">
+              <label className="block font-mono text-[11px] tracking-wide text-[#9BA1A6] uppercase">
+                Display Name
+              </label>
+              <div className="relative flex items-center">
+                <UserRound className="pointer-events-none absolute left-3 h-5 w-5 text-[#9BA1A6]" />
                 <input
-                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
-                  placeholder="display name (optional)"
+                  className="w-full rounded border border-[#2C2C31] bg-[#1C1C21] py-2.5 pl-10 pr-3 text-white placeholder:text-[#9BA1A6] outline-none focus:border-[#D3131B] focus:shadow-[0_0_10px_rgba(211,19,27,0.2)] transition-all"
+                  placeholder="Optional"
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   autoComplete="name"
                 />
               </div>
+            </div>
 
-              <div className="relative flex items-center pb-4">
-                <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+            <div className="space-y-1.5">
+              <label className="block font-mono text-[11px] tracking-wide text-[#9BA1A6] uppercase">
+                Password
+              </label>
+              <div className="relative flex items-center">
+                <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-[#9BA1A6]" />
                 <input
-                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
-                  placeholder="password"
+                  className="w-full rounded border border-[#2C2C31] bg-[#1C1C21] py-2.5 pl-10 pr-3 text-white placeholder:text-[#9BA1A6] outline-none focus:border-[#D3131B] focus:shadow-[0_0_10px_rgba(211,19,27,0.2)] transition-all"
+                  placeholder="••••••••"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -101,12 +113,17 @@ export default function Register() {
                   minLength={8}
                 />
               </div>
+            </div>
 
+            <div className="space-y-1.5">
+              <label className="block font-mono text-[11px] tracking-wide text-[#9BA1A6] uppercase">
+                Confirm Password
+              </label>
               <div className="relative flex items-center">
-                <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-[#9AA0AA]" />
+                <LockKeyhole className="pointer-events-none absolute left-3 h-5 w-5 text-[#9BA1A6]" />
                 <input
-                  className="rounded-xl border border-[#9AA0AA] bg-[#121216] py-2 pl-10 pr-3 text-[#9AA0AA] shadow-sm focus:border-[#7A1218] sm:text-md w-full outline-none"
-                  placeholder="confirm password"
+                  className="w-full rounded border border-[#2C2C31] bg-[#1C1C21] py-2.5 pl-10 pr-3 text-white placeholder:text-[#9BA1A6] outline-none focus:border-[#D3131B] focus:shadow-[0_0_10px_rgba(211,19,27,0.2)] transition-all"
+                  placeholder="••••••••"
                   type="password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
@@ -120,17 +137,17 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-[#7A1218] text-[#FFFFFF] text-[12px] px-10 py-4 rounded-2xl cursor-pointer disabled:opacity-50"
+              className="w-full bg-[#D3131B] hover:bg-[#b01016] text-white font-bold rounded-lg py-3 cursor-pointer transition active:scale-[0.98] disabled:opacity-50"
             >
               {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
         </div>
 
-        <div className="px-4 w-screen">
+        <div className="mt-4">
           <button
             onClick={() => navigate("/login", { replace: true })}
-            className="border-[#2A2A33] border-2 w-full text-[#FFFFFF] text-[12px] px-10 py-4 rounded-2xl cursor-pointer"
+            className="w-full border border-[#2C2C31] hover:border-white text-white font-bold rounded-lg py-3 cursor-pointer transition-all active:scale-[0.98]"
           >
             Already have an account? Sign In
           </button>
