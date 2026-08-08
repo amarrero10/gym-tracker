@@ -1,6 +1,95 @@
 import { useCallback, useEffect, useState } from "react";
 import api from "../api/axios";
 
+const SessionCalendar = ({ completedDates }) => {
+  const today = new Date();
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
+
+  const dateSet = new Set(completedDates);
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const prevMonth = () => {
+    if (month === 0) {
+      setMonth(11);
+      setYear((y) => y - 1);
+    } else setMonth((m) => m - 1);
+  };
+  const nextMonth = () => {
+    if (month === 11) {
+      setMonth(0);
+      setYear((y) => y + 1);
+    } else setMonth((m) => m + 1);
+  };
+
+  const monthLabel = new Date(year, month).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const cells = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const isToday = (d) =>
+    d === today.getDate() &&
+    month === today.getMonth() &&
+    year === today.getFullYear();
+
+  const isCompleted = (d) => {
+    const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    return dateSet.has(key);
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <button
+          onClick={prevMonth}
+          className="text-[#9AA0AA] hover:text-white px-2 py-1 cursor-pointer"
+        >
+          ‹
+        </button>
+        <p className="text-white text-sm font-medium">{monthLabel}</p>
+        <button
+          onClick={nextMonth}
+          className="text-[#9AA0AA] hover:text-white px-2 py-1 cursor-pointer"
+        >
+          ›
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 mb-1">
+        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+          <div key={d} className="text-center text-[#9AA0AA] text-xs">
+            {d}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {cells.map((d, i) => (
+          <div
+            key={i}
+            className={`
+              h-8 flex items-center justify-center rounded-lg text-xs
+              ${d === null ? "" : isCompleted(d) ? "bg-green-600 text-white font-semibold" : isToday(d) ? "bg-[#2A2A33] text-white" : "text-[#9AA0AA]"}
+            `}
+          >
+            {d ?? ""}
+          </div>
+        ))}
+      </div>
+      {completedDates.length > 0 && (
+        <p className="text-[#9AA0AA] text-xs mt-3 text-center">
+          {completedDates.length} workout
+          {completedDates.length !== 1 ? "s" : ""} completed
+        </p>
+      )}
+    </div>
+  );
+};
+
 const WeightChart = ({ entries }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -18,7 +107,11 @@ const WeightChart = ({ entries }) => {
   const toY = (w) => padY + (1 - (w - minW) / range) * (H - padY * 2);
 
   const points = entries.map((e, i) => `${toX(i)},${toY(e.weight)}`).join(" ");
-  const labelIndices = [0, Math.floor((entries.length - 1) / 2), entries.length - 1];
+  const labelIndices = [
+    0,
+    Math.floor((entries.length - 1) / 2),
+    entries.length - 1,
+  ];
 
   const tooltip = (() => {
     if (hoveredIndex === null) return null;
@@ -29,14 +122,37 @@ const WeightChart = ({ entries }) => {
     const tipH = 34;
     const tipX = cx > W / 2 ? cx - tipW - 10 : cx + 10;
     const tipY = Math.max(padY, cy - tipH / 2);
-    const dateLabel = new Date(entry.date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const dateLabel = new Date(entry.date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
     return (
       <g>
-        <rect x={tipX} y={tipY} width={tipW} height={tipH} rx="5" fill="#1E1E28" />
-        <text x={tipX + tipW / 2} y={tipY + 13} fill="#F5F6F7" fontSize="9" textAnchor="middle" fontWeight="600">
+        <rect
+          x={tipX}
+          y={tipY}
+          width={tipW}
+          height={tipH}
+          rx="5"
+          fill="#1E1E28"
+        />
+        <text
+          x={tipX + tipW / 2}
+          y={tipY + 13}
+          fill="#F5F6F7"
+          fontSize="9"
+          textAnchor="middle"
+          fontWeight="600"
+        >
           {entry.weight} lbs
         </text>
-        <text x={tipX + tipW / 2} y={tipY + 26} fill="#9AA0AA" fontSize="8" textAnchor="middle">
+        <text
+          x={tipX + tipW / 2}
+          y={tipY + 26}
+          fill="#9AA0AA"
+          fontSize="8"
+          textAnchor="middle"
+        >
           {dateLabel}
         </text>
       </g>
@@ -49,8 +165,21 @@ const WeightChart = ({ entries }) => {
         const y = padY + t * (H - padY * 2);
         return (
           <g key={t}>
-            <line x1={padX} x2={W - padX} y1={y} y2={y} stroke="#2A2A33" strokeWidth="1" />
-            <text x={padX} y={y - 3} fill="#9AA0AA" fontSize="8" textAnchor="start">
+            <line
+              x1={padX}
+              x2={W - padX}
+              y1={y}
+              y2={y}
+              stroke="#2A2A33"
+              strokeWidth="1"
+            />
+            <text
+              x={padX}
+              y={y - 3}
+              fill="#9AA0AA"
+              fontSize="8"
+              textAnchor="start"
+            >
               {(maxW - t * range).toFixed(1)}
             </text>
           </g>
@@ -63,7 +192,13 @@ const WeightChart = ({ entries }) => {
         fillOpacity="0.15"
         stroke="none"
       />
-      <polyline points={points} fill="none" stroke="#7A1218" strokeWidth="2" strokeLinejoin="round" />
+      <polyline
+        points={points}
+        fill="none"
+        stroke="#7A1218"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
 
       {entries.map((e, i) => (
         <circle
@@ -87,7 +222,10 @@ const WeightChart = ({ entries }) => {
           style={{ cursor: "pointer" }}
           onMouseEnter={() => setHoveredIndex(i)}
           onMouseLeave={() => setHoveredIndex(null)}
-          onTouchStart={(ev) => { ev.preventDefault(); setHoveredIndex(i); }}
+          onTouchStart={(ev) => {
+            ev.preventDefault();
+            setHoveredIndex(i);
+          }}
           onTouchEnd={() => setHoveredIndex(null)}
         />
       ))}
@@ -101,9 +239,14 @@ const WeightChart = ({ entries }) => {
           y={H}
           fill="#9AA0AA"
           fontSize="8"
-          textAnchor={i === 0 ? "start" : i === entries.length - 1 ? "end" : "middle"}
+          textAnchor={
+            i === 0 ? "start" : i === entries.length - 1 ? "end" : "middle"
+          }
         >
-          {new Date(entries[i].date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+          {new Date(entries[i].date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          })}
         </text>
       ))}
     </svg>
@@ -120,9 +263,14 @@ const Progress = () => {
   const [personalRecords, setPersonalRecords] = useState([]);
 
   // Weight tracking state
+  const [completedDates, setCompletedDates] = useState([]);
+
+  // Weight tracking state
   const [weightEntries, setWeightEntries] = useState([]);
   const [weightInput, setWeightInput] = useState("");
-  const [weightDate, setWeightDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [weightDate, setWeightDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
   const [loggingWeight, setLoggingWeight] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editWeight, setEditWeight] = useState("");
@@ -169,7 +317,11 @@ const Progress = () => {
             volume += w * r;
 
             const current = prMap.get(exId);
-            if (!current || w > current.maxWeight || (w === current.maxWeight && r > current.maxReps)) {
+            if (
+              !current ||
+              w > current.maxWeight ||
+              (w === current.maxWeight && r > current.maxReps)
+            ) {
               prMap.set(exId, { name: exName, maxWeight: w, maxReps: r });
             }
           });
@@ -177,6 +329,11 @@ const Progress = () => {
       });
 
       setTotalVolume(volume);
+
+      const dates = completed
+        .filter((s) => s.completedAt)
+        .map((s) => new Date(s.completedAt).toISOString().slice(0, 10));
+      setCompletedDates(dates);
 
       const sorted = Array.from(prMap.values())
         .filter((pr) => pr.maxWeight > 0)
@@ -205,7 +362,9 @@ const Progress = () => {
         date: weightDate,
       });
       setWeightEntries((prev) =>
-        [...prev, res.data.entry].sort((a, b) => new Date(a.date) - new Date(b.date))
+        [...prev, res.data.entry].sort(
+          (a, b) => new Date(a.date) - new Date(b.date),
+        ),
       );
       setWeightInput("");
     } catch (err) {
@@ -230,7 +389,7 @@ const Progress = () => {
       setWeightEntries((prev) =>
         prev
           .map((e) => (e._id === id ? res.data.entry : e))
-          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .sort((a, b) => new Date(a.date) - new Date(b.date)),
       );
       setEditingId(null);
     } catch (err) {
@@ -253,12 +412,20 @@ const Progress = () => {
   };
 
   const formatDate = (dateStr) =>
-    new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+    new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "2-digit",
+    });
 
   // Compute weight change from first to last entry
-  const weightChange = weightEntries.length >= 2
-    ? (weightEntries[weightEntries.length - 1].weight - weightEntries[0].weight).toFixed(1)
-    : null;
+  const weightChange =
+    weightEntries.length >= 2
+      ? (
+          weightEntries[weightEntries.length - 1].weight -
+          weightEntries[0].weight
+        ).toFixed(1)
+      : null;
 
   if (error)
     return (
@@ -285,7 +452,9 @@ const Progress = () => {
       {planProgress ? (
         <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
           <p className="text-[#9AA0AA] text-sm mb-1">Current Plan</p>
-          <p className="text-white font-medium capitalize mb-3">{activePlanName}</p>
+          <p className="text-white font-medium capitalize mb-3">
+            {activePlanName}
+          </p>
           <div className="w-full bg-[#2A2A33] rounded-full h-2 mb-2">
             <div
               className="bg-[#7A1218] h-2 rounded-full transition-all"
@@ -317,7 +486,9 @@ const Progress = () => {
         </div>
         <div className="bg-[#14141A] rounded-2xl p-4">
           <p className="text-[#9AA0AA] text-xs mb-1">Total Volume</p>
-          <p className="text-white text-2xl font-semibold">{formatVolume(totalVolume)}</p>
+          <p className="text-white text-2xl font-semibold">
+            {formatVolume(totalVolume)}
+          </p>
           <p className="text-[#9AA0AA] text-xs">lbs lifted</p>
         </div>
       </div>
@@ -329,7 +500,11 @@ const Progress = () => {
           {weightChange !== null && (
             <span
               className={`text-xs font-semibold ${
-                parseFloat(weightChange) < 0 ? "text-green-400" : parseFloat(weightChange) > 0 ? "text-red-400" : "text-[#9AA0AA]"
+                parseFloat(weightChange) < 0
+                  ? "text-green-400"
+                  : parseFloat(weightChange) > 0
+                    ? "text-red-400"
+                    : "text-[#9AA0AA]"
               }`}
             >
               {parseFloat(weightChange) > 0 ? "+" : ""}
@@ -374,7 +549,9 @@ const Progress = () => {
 
         {/* Entry list */}
         {weightEntries.length === 0 ? (
-          <p className="text-[#9AA0AA] text-sm">No entries yet. Log your first weigh-in above.</p>
+          <p className="text-[#9AA0AA] text-sm">
+            No entries yet. Log your first weigh-in above.
+          </p>
         ) : (
           <div className="space-y-2 max-h-52 overflow-y-auto">
             {[...weightEntries].reverse().map((entry) =>
@@ -409,10 +586,17 @@ const Progress = () => {
                   </button>
                 </div>
               ) : (
-                <div key={entry._id} className="flex items-center justify-between">
-                  <p className="text-[#9AA0AA] text-sm">{formatDate(entry.date)}</p>
+                <div
+                  key={entry._id}
+                  className="flex items-center justify-between"
+                >
+                  <p className="text-[#9AA0AA] text-sm">
+                    {formatDate(entry.date)}
+                  </p>
                   <div className="flex items-center gap-3">
-                    <p className="text-white text-sm font-medium">{entry.weight} lbs</p>
+                    <p className="text-white text-sm font-medium">
+                      {entry.weight} lbs
+                    </p>
                     <button
                       onClick={() => handleEditStart(entry)}
                       className="text-[#9AA0AA] text-xs hover:text-white cursor-pointer"
@@ -427,7 +611,7 @@ const Progress = () => {
                     </button>
                   </div>
                 </div>
-              )
+              ),
             )}
           </div>
         )}
@@ -451,6 +635,18 @@ const Progress = () => {
               </div>
             ))}
           </div>
+        )}
+      </div>
+
+      {/* Workout Calendar */}
+      <div className="bg-[#14141A] rounded-2xl p-4 mb-4">
+        <p className="text-white font-medium mb-3">Workout Calendar</p>
+        {completedDates.length === 0 ? (
+          <p className="text-[#9AA0AA] text-sm">
+            Complete a session to see it highlighted here.
+          </p>
+        ) : (
+          <SessionCalendar completedDates={completedDates} />
         )}
       </div>
     </div>

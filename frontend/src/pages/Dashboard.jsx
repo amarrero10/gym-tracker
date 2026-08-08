@@ -36,7 +36,8 @@ const Dashboard = () => {
       if (document.visibilityState === "visible") getPlans();
     };
     document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
   }, [getPlans]);
 
   useEffect(() => {
@@ -56,8 +57,6 @@ const Dashboard = () => {
           api.get(`/sessions/in-progress?planId=${active._id}`),
           api.get(`/sessions/completed-sessions?planId=${active._id}`), // your endpoint for completed
         ]);
-
-        console.log("COMPLETED SESH ", completedRes.data.sessions);
 
         setActiveSession(inProgressRes.data.session ?? null);
         setCompletedSessions(completedRes.data.sessions ?? []);
